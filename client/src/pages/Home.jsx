@@ -1,8 +1,14 @@
 import React from 'react'
-
+import Carousal from '../components/Carousal'
+import TrendingAnime from '../components/TrendingAnime'
+import HighestRated from '../components/HighestRated'
 const Home = () => {
   return (
-    <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut maiores eaque doloremque, laborum consequatur at optio eveniet illo unde! Accusantium fugit saepe temporibus quae illum deleniti placeat provident est, enim perferendis neque praesentium nam culpa mollitia nemo asperiores et, in deserunt quis alias possimus, doloribus voluptatibus maiores eligendi. Sapiente magni accusantium ipsa doloremque qui ipsum eos fugiat. In blanditiis quasi, placeat eos enim ullam nobis unde ipsa, sit maiores odit quis explicabo corporis eaque illo tempora quae cum necessitatibus asperiores similique dolore fugit veniam. Aliquid reiciendis ipsa maxime eveniet nesciunt error totam accusantium incidunt est provident soluta autem consectetur deleniti quidem voluptatum nihil illo dicta culpa facilis inventore, vel debitis laudantium. Consequuntur repellendus dignissimos quasi vero quos, non odio sequi reiciendis autem quod? Est velit adipisci repellat consequuntur? Nisi, perspiciatis non aut dicta cupiditate corporis ullam labore, iure minus ratione aspernatur explicabo minima porro necessitatibus eos maxime vitae, error odit modi. Quia perferendis voluptatem quas soluta deleniti quae tempora quo ex minima reprehenderit earum iste ipsam iure doloremque consectetur eaque, unde maiores incidunt nesciunt facilis, itaque dolore aperiam. Quam non ipsam ducimus sunt ratione eaque harum fugit blanditiis laboriosam numquam, beatae ipsa aspernatur, tempora eius? Saepe alias ipsa suscipit tenetur provident cupiditate molestiae dicta nihil reprehenderit totam ea facilis doloribus, voluptas voluptatibus, eaque quas a maxime natus porro. Iste in pariatur voluptatum dolorem! Officia ratione odit facere accusamus aspernatur corrupti consequuntur voluptatibus explicabo, impedit, autem velit ad iusto dolorem. Eligendi consectetur exercitationem nam eos at. Ipsam odio magnam, a vel voluptatum cum est culpa repellendus alias quisquam magni odit vitae necessitatibus accusamus aliquid in nisi quasi natus tenetur temporibus quos! Dignissimos, enim laborum. At iusto mollitia, fugit obcaecati, aspernatur exercitationem repellat natus, expedita tenetur eius dolorum! Officia aspernatur rem neque fugiat ad quaerat error aperiam incidunt vitae quibusdam, eaque tempora distinctio eius beatae voluptatem, vel libero necessitatibus impedit doloremque veritatis voluptates sit, ullam culpa tempore? Error cum sequi amet eius exercitationem reiciendis inventore architecto, itaque ratione maxime id consectetur eligendi facere sint, fugiat quo! Eveniet repudiandae et libero vel harum est consequuntur vitae culpa neque?</div>
+    <div>
+      <Carousal/>
+      <TrendingAnime/>
+      <HighestRated/>
+    </div>
   )
 }
 
