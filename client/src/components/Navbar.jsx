@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <div className="backdrop-blur-sm bg-white/20 w-[90%] top-4 left-1/2 -translate-x-1/2 fixed z-50 p-2 flex items-center justify-evenly rounded-full shadow-lg">
+    <div className="backdrop-blur-sm bg-white/20 w-[70%] top-4 left-1/2 -translate-x-1/2 fixed z-50 p-2 flex items-center justify-evenly rounded-full shadow-lg">
       <div className="size-16 rounded-full overflow-hidden">
         <img
           src="https://dummyimage.com/500x500"

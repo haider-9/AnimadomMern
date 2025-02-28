@@ -8,8 +8,7 @@ const App = () => {
   return (
     <Router> 
       <Navbar />
-      <main className="mt-24 pt-5">
-
+      <main className="mt-10">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />

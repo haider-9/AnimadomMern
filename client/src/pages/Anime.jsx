@@ -3,13 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegStar, FaPlay, FaCheckCircle, FaFilm } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
-import PropTypes from "prop-types";
 import AnimeCard from "../components/AnimeCard";
-
-const formatDate = (date) => {
-  if (!date?.year) return "TBA";
-  return `${date.year}/${date.month || "??"}/${date.day || "??"}`;
-};
 
 const AnimeDescription = () => {
   const [animeData, setAnimeData] = useState(null);
@@ -30,7 +24,7 @@ const AnimeDescription = () => {
   });
 
   const { animeId } = useParams();
-
+  window.scrollTo(0, 0);  
   useEffect(() => {
     let isMounted = true;
 
