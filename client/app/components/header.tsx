@@ -1,17 +1,25 @@
 import { LucideTv, Search, User } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "./ui/button";
+import { useState } from "react";
+import { FaSearch, FaRegTimesCircle } from "react-icons/fa";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
 
 export default function Header() {
+  const [search, setSearch] = useState("");
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const handleSearch = () => {
+    if (search.trim()) {
+    } else {
+    }
+  };
   return (
-    <header className="w-full py-4 px-6 flex justify-between items-center z-50 border-b">
+    <div className="w-full py-4 px-6 flex justify-between items-center z-50 border-b">
       {/* Left Section: Logo + Nav */}
       <div className="flex items-center gap-6">
         {/* Logo */}
@@ -58,36 +66,71 @@ export default function Header() {
       {/* Right Section: Search + Actions */}
       <div className="flex items-center gap-4">
         {/* Search Bar */}
-        <div className="hidden lg:flex items-center relative">
-          <Input
-            placeholder="Search anime..."
-            className="w-48 bg-neutral-800/50 border-neutral-700 text-white placeholder-neutral-400 focus:ring-1 focus:ring-cyan-500 rounded-md pr-8"
-          />
-          <Search className="h-4 w-4 text-neutral-400 absolute right-2" />
-        </div>
+        <div className="relative">
+          <div
+            className={`flex items-center transition-all duration-300 ease-out ${
+              isSearchExpanded
+                ? "bg-white/5 border border-white/10 rounded-full w-64"
+                : "bg-transparent w-10"
+            }`}
+          >
+            <button
+              onClick={() => setIsSearchExpanded(true)}
+              className={`p-2.5 text-gray-400 hover:text-white transition-colors ${
+                isSearchExpanded ? "hidden" : "block"
+              }`}
+            >
+              <FaSearch className="h-5 w-5" />
+            </button>
 
-        {/* Auth Buttons */}
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline">
-            Log In
-          </Button>
-          <Button size="sm">Get Started</Button>
+            {isSearchExpanded && (
+              <div className="flex-1 flex items-center">
+                <FaSearch className="ml-4 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder="Search..."
+                  className="w-full px-3 py-2.5 bg-transparent text-sm text-white placeholder-gray-400 focus:outline-none"
+                  autoFocus
+                />
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setIsSearchExpanded(false);
+                  }}
+                  className="p-2 text-gray-400 hover:text-white"
+                >
+                  <FaRegTimesCircle className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* User Profile Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5 text-neutral-300" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
-    </header>
+
+      {/* Auth Buttons */}
+      <div className="flex gap-2">
+        <Button size="sm" variant="outline">
+          Log In
+        </Button>
+        <Button size="sm">Get Started</Button>
+      </div>
+
+      {/* User Profile Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <User className="h-5 w-5 text-neutral-300" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white">
+          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>Logout</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

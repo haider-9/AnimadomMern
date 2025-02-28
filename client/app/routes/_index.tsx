@@ -1,5 +1,6 @@
 import type { Route } from "./+types/_index";
 import Carousel from "~/components/carousel";
+import TrendingAnime from "~/components/trendinganime";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -13,6 +14,7 @@ export default function Home() {
     <>
       <main>
         <Carousel />
+        <TrendingAnime />
       </main>
     </>
   );

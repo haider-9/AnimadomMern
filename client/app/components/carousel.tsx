@@ -58,15 +58,15 @@ export default function Carousel() {
               <img
                 src={anime.imageUrl}
                 alt={anime.name}
-                className="w-full h-full object-cover transition-all duration-700 hover:scale-105 filter brightness-90"
+                className="w-full h-full object-cover filter brightness-90"
                 loading="eager"
               />
               <div className="absolute bottom-0 left-0 px-3 py-5 md:px-6 md:py-9 xl:px-9 xl:py-14 bg-gradient-to-t from-black/95 via-black/70 to-transparent w-full transform transition-transform duration-500">
-                <div className="space-y-1 transform transition-all duration-500 translate-y-0 hover:-translate-y-2">
+                <div className="space-y-1 ">
                   <img
                     src={anime.titleImage}
                     alt={`${anime.name} title`}
-                    className="h-10 md:h-16 xl:h-20 object-contain drop-shadow-lg transition-transform duration-300 hover:scale-105"
+                    className="h-10 md:h-16 xl:h-20 object-contain drop-shadow-lg "
                     loading="eager"
                   />
                   <div className="flex items-center gap-2 md:text-lg xl:text-xl">
