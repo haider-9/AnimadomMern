@@ -99,3 +99,21 @@ body {
     @apply max-w-[1480px] w-full px-4 mx-auto sm:px-6 lg:px-8;
   }
 }
+@keyframes float {
+  0% { transform: translateY(0px); opacity: 0; }
+  50% { transform: translateY(-20px); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 3s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}

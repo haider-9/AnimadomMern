@@ -2,6 +2,8 @@ import type { Route } from "./+types/_index";
 import Carousel from "~/components/carousel";
 import TrendingAnime from "~/components/trendinganime";
 
+import Toprated from "~/components/top-rated";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Animadom" },
@@ -13,8 +15,10 @@ export default function Home() {
   return (
     <>
       <main>
+      
         <Carousel />
         <TrendingAnime />
+        <Toprated />
       </main>
     </>
   );

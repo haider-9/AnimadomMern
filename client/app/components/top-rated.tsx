@@ -23,10 +23,9 @@ export default function TrendingAnime() {
       try {
         const query = `
           query {
-            Page(page: 1, perPage: 10) {
-              media(type: ANIME, sort: TRENDING_DESC) {
-                title {
-                  romaji
+            Page(page: 1, perPage: 20) {
+              media(type: ANIME, sort: SCORE_DESC) {
+                title {                  romaji
                   english
                   
                 }
@@ -67,12 +66,12 @@ export default function TrendingAnime() {
 
   return (
     <section className="py-8">
-      <h2 className="text-2xl font-bold mb-6 px-4">Trending Now</h2>
+      <h2 className="text-2xl font-bold mb-6 px-4">Top Rated Anime</h2>
       <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
         {trendingAnime.map((anime) => (
           <AnimeCard
             key={anime.idMal}
-            title={anime.title.english||anime.title.romaji}
+            title={anime.title.english || anime.title.romaji}
             imageUrl={anime.coverImage.large}
             hreflink={`/anime/${anime.idMal}`}
             score={anime.averageScore}
