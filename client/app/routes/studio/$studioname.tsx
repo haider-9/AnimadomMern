@@ -18,13 +18,6 @@ interface AnimeData {
   genres: string[];
 }
 
-interface PageInfo {
-  total: number;
-  currentPage: number;
-  lastPage: number;
-  hasNextPage: boolean;
-}
-
 export default function StudioPage() {
   const { studioname } = useParams();
   const [animeList, setAnimeList] = useState<AnimeData[]>([]);
@@ -69,7 +62,7 @@ export default function StudioPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify({
             query: query,
@@ -119,18 +112,20 @@ export default function StudioPage() {
         Anime by {studioname}
       </h1>
       {animeList.length > 0 ? (
-      <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
+        <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
           {animeList.map((anime) => (
             <AnimeCard
-            key={anime.idMal}
-            imageUrl={anime.coverImage.large}
-            title={anime.title.english || anime.title.romaji}
-            hreflink={`/anime/${anime.idMal}`}
-          />
+              key={anime.idMal}
+              imageUrl={anime.coverImage.large}
+              title={anime.title.english || anime.title.romaji}
+              hreflink={`/anime/${anime.idMal}`}
+            />
           ))}
         </div>
       ) : (
-        <div className="text-center text-xl">No anime found for this studio.</div>
+        <div className="text-center text-xl">
+          No anime found for this studio.
+        </div>
       )}
 
       {totalPages > 1 && (

@@ -392,12 +392,13 @@ export default function AnimeDescription({
                   <h2 className="text-3xl font-bold">Main Characters</h2>
                 </div>
                 <div className="flex flex-wrap  w-[95%] gap-4 mx-auto">
-                  {characters?.map((char: any) => (
+                  {characters?.filter(char => char.role === "Main")?.map((char: any) => (
                     <CharacterCard
                       hreflink={`/character/${char.character.mal_id}`}
                       name={char.character.name}
                       imageUrl={char.character.images.jpg.image_url}
                       role={char.role}
+                      animeAppearances={char.voice_actors.length}
                     />
                   ))}
                 </div>
@@ -406,8 +407,8 @@ export default function AnimeDescription({
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-3xl font-bold">Similar Anime</h2>
                 </div>
-                <div className="flex flex-wrap w-[95%] gap-4 mx-auto">
-                  {recommendations?.map(({ entry }) => (
+                <div className="flex flex-wrap w-screen gap-4 mx-auto">
+                  {recommendations?.slice(0, 15)?.map(({ entry }) => (
                     <AnimeCard
                       key={entry.mal_id}
                       imageUrl={entry.images?.webp?.image_url}
@@ -416,8 +417,7 @@ export default function AnimeDescription({
                     />
                   ))}
                 </div>
-              </section>
-            </div>
+              </section>            </div>
 
             {/* Right Sidebar */}
             <div className="lg:col-span-1">

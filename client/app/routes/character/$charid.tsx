@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useParams } from "react-router";
-import AnimeCard from "~/components/animecard";
-import { FaHeart } from "react-icons/fa";
+import { Link, useParams } from "react-router";
+import { FaHeart, FaMicrophone, FaStar, FaFilm } from "react-icons/fa";
 
 interface CharacterData {
   id: number;
@@ -178,6 +177,15 @@ export default function CharacterDetails() {
                     </span>
                   </div>
 
+                  <Link to={`/voiceactor/${characterData.id}`}>
+                    <div className="flex items-center gap-2 mb-3 bg-purple-500/20 p-4 rounded-xl cursor-pointer hover:bg-purple-500/30 transition-all duration-300">
+                      <FaMicrophone className="text-purple-500" />
+                      <span className="text-purple-200 font-medium">
+                        Voice Actors
+                      </span>
+                    </div>
+                  </Link>
+
                   {characterData.gender && (
                     <div className="bg-zinc-700/30 p-4 rounded-xl">
                       <span className="text-zinc-400">Gender: </span>
@@ -208,7 +216,7 @@ export default function CharacterDetails() {
               </motion.div>
             </div>
 
-            {/* Right Column - Description and Appearances */}
+            {/* Right Column - Additional Info */}
             <div className="md:col-span-2 space-y-8">
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
@@ -219,31 +227,72 @@ export default function CharacterDetails() {
                 <div
                   className="text-zinc-300 leading-relaxed prose prose-invert max-w-none"
                   dangerouslySetInnerHTML={{
-                    __html: characterData.description,
+                    __html:
+                      characterData.description || "No description available.",
                   }}
                 />
-              </motion.div>
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h2 className="text-2xl font-semibold mb-6">Appearances</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {characterData.media.nodes.map((media) => (
-                    <AnimeCard
-                      key={media.id}
-                      imageUrl={media.coverImage.large}
-                      title={media.title.english || media.title.romaji}
-                      hreflink={`/anime/${media.id}`}
-                      score={media.averageScore / 10}
-                    />
-                  ))}
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-zinc-700/30 p-6 rounded-xl">
+                    <h3 className="text-xl font-semibold mb-3">
+                      Character Traits
+                    </h3>
+                    <ul className="space-y-2 text-zinc-300">
+                      <li>• Personality Type</li>
+                      <li>• Notable Features</li>
+                      <li>• Character Arc</li>
+                    </ul>
+                  </div>
+                  <div className="bg-zinc-700/30 p-6 rounded-xl">
+                    <h3 className="text-xl font-semibold mb-3">Background</h3>
+                    <ul className="space-y-2 text-zinc-300">
+                      <li>• Origin Story</li>
+                      <li>• Key Events</li>
+                      <li>• Character Development</li>
+                    </ul>
+                  </div>
                 </div>
               </motion.div>
             </div>
           </div>
+
+          {/* Full Width Appearances Section */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="mt-8 bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
+          >
+            <h2 className="text-2xl font-semibold mb-6">Appearances</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {characterData.media.nodes.map((media) => (
+                <Link
+                  to={`/anime/${media.id}`}
+                  key={media.id}
+                  className="block bg-zinc-700/30 rounded-xl overflow-hidden hover:bg-zinc-700/50 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-4 p-4">
+                    <img
+                      src={media.coverImage.large}
+                      alt={media.title.english || media.title.romaji}
+                      className="w-20 h-28 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-medium text-lg line-clamp-2">
+                        {media.title.english || media.title.romaji}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <FaStar className="text-yellow-500" />
+                        <span className="text-yellow-200">
+                          {media.averageScore / 10}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+          
         </div>
       </motion.div>
     </AnimatePresence>
