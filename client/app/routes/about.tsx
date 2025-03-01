@@ -1,5 +1,6 @@
 import { Button } from "~/components/ui/button";
 import type { Route } from "../+types/root";
+import CharacterCard from "~/components/charactercard";
 
 export default function About() {
   return (
@@ -7,7 +8,9 @@ export default function About() {
       <head>
         <title>About</title>
       </head>
-          <div>About</div>
+          <div>
+
+          </div>
 
     </>
   );

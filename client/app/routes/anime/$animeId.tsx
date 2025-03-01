@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegStar, FaPlay, FaCheckCircle, FaFilm } from "react-icons/fa";
-import { Link, useParams } from "react-router"; // Fixed import
+import { Link, useLoaderData } from "react-router"; // Using useLoaderData
 import AnimeCard from "~/components/animecard";
 import { Button } from "~/components/ui/button";
+import type { Route } from "./+types/$animeId";
+import CharacterCard from "~/components/charactercard";
 
 interface AnimeData {
   title_english: string;
@@ -56,7 +57,7 @@ interface Character {
 }
 
 interface Recommendation {
-  mal_id: number; // Added mal_id
+  mal_id: number;
   entry: {
     mal_id: number;
     title: string;
@@ -68,46 +69,27 @@ interface Recommendation {
   };
 }
 
-export default function AnimeDescription() {
-  const params = useParams();
-  const [animeData, setAnimeData] = useState<AnimeData | null>(null);
-  const [animeCharacters, setAnimeCharacters] = useState<Character[]>([]);
-  const [similarAnime, setSimilarAnime] = useState<Recommendation[]>([]);
-  const [animeDetails, setAnimeDetails] = useState<AnimeDetails>({
-    coverImage: "",
-    posterImage: "",
-    startDate: { year: null, month: null, day: null },
-    endDate: { year: null, month: null, day: null },
-    nextEpisode: null,
-    reviews: [],
-    trailer: null,
-    tags: [],
-    studios: [],
-  });
+export async function loader({ params: { animeId } }: Route.LoaderArgs) {
+  const fetchJikanData = async () => {
+    const responses = await Promise.all([
+      fetch(`https://api.jikan.moe/v4/anime/${animeId}`),
+      fetch(`https://api.jikan.moe/v4/anime/${animeId}/characters`),
+      fetch(`https://api.jikan.moe/v4/anime/${animeId}/recommendations`),
+    ]);
 
-  useEffect(() => {
-    const fetchJikanData = async () => {
-      const responses = await Promise.all([
-        fetch(`https://api.jikan.moe/v4/anime/${params.animeId}`),
-        fetch(`https://api.jikan.moe/v4/anime/${params.animeId}/characters`),
-        fetch(
-          `https://api.jikan.moe/v4/anime/${params.animeId}/recommendations`
-        ),
-      ]);
+    const [animeResponse, charsResponse, recsResponse] = await Promise.all(
+      responses.map((res) => res.json())
+    );
 
-      const [animeResponse, charsResponse, recsResponse] = await Promise.all(
-        responses.map((res) => res.json())
-      );
-
-      return {
-        animeData: animeResponse.data,
-        characters: charsResponse.data,
-        recommendations: recsResponse.data,
-      };
+    return {
+      animeData: animeResponse.data,
+      characters: charsResponse.data,
+      recommendations: recsResponse.data,
     };
+  };
 
-    const fetchAniListData = async (malId: string) => {
-      const query = `
+  const fetchAniListData = async (malId: string) => {
+    const query = `
         query ($idMal: Int) {
           Media(idMal: $idMal, type: ANIME) {
             coverImage {
@@ -156,76 +138,75 @@ export default function AnimeDescription() {
         }
       `;
 
-      const response = await fetch("https://graphql.anilist.co", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query,
-          variables: { idMal: parseInt(malId) },
-        }),
-      });
+    const response = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query,
+        variables: { idMal: parseInt(malId) },
+      }),
+    });
 
-      const { data } = await response.json();
-      const media = data?.Media;
+    const { data } = await response.json();
+    const media = data?.Media;
 
-      return {
-        coverImage: media?.bannerImage || "",
-        posterImage:
-          media?.coverImage?.extraLarge || media?.coverImage?.large || "",
-        startDate: media?.startDate || { year: null, month: null, day: null },
-        endDate: media?.endDate || { year: null, month: null, day: null },
-        nextEpisode: media?.nextAiringEpisode
-          ? {
-              episode: media.nextAiringEpisode.episode,
-              timeUntilAiring: media.nextAiringEpisode.timeUntilAiring,
-            }
-          : null,
-        reviews: media?.reviews?.nodes || [],
-        trailer: media?.trailer || null,
-        tags: media?.tags || [],
-        studios: media?.studios?.nodes || [],
-      };
+    return {
+      coverImage: media?.bannerImage || "",
+      posterImage:
+        media?.coverImage?.extraLarge || media?.coverImage?.large || "",
+      startDate: media?.startDate || { year: null, month: null, day: null },
+      endDate: media?.endDate || { year: null, month: null, day: null },
+      nextEpisode: media?.nextAiringEpisode
+        ? {
+            episode: media.nextAiringEpisode.episode,
+            timeUntilAiring: media.nextAiringEpisode.timeUntilAiring,
+          }
+        : null,
+      reviews: media?.reviews?.nodes || [],
+      trailer: media?.trailer || null,
+      tags: media?.tags || [],
+      studios: media?.studios?.nodes || [],
     };
+  };
 
-    const loadAllData = async () => {
-      try {
-        const jikanData = await fetchJikanData();
-        setAnimeData(jikanData.animeData);
-        setAnimeCharacters(
-          jikanData.characters?.filter(
-            (char: Character) => char.role === "Main"
-          ) || []
-        );
-        setSimilarAnime(
-          jikanData.recommendations
-            ?.slice(0, 10)
-            .map((item: Recommendation) => item.entry) || []
-        );
+  const jikanData = await fetchJikanData();
+  const anilistData = await fetchAniListData(animeId);
 
-        if (params.animeId) {
-          const anilistData = await fetchAniListData(params.animeId);
-          setAnimeDetails(anilistData);
-        }
-      } catch (error) {
-        console.error("Error loading anime data:", error);
-      }
-    };
+  return {
+    animeId,
+    ...jikanData,
+    animeDetails: anilistData,
+  };
+}
 
-    loadAllData();
-  }, [params.animeId]);
+export default function AnimeDescription({
+  loaderData,
+  params: { animeId },
+}: Route.ComponentProps) {
+  const { animeData, characters, recommendations, animeDetails } = loaderData;
 
-  const { startDate, endDate, nextEpisode } = animeDetails;
-  const { title, title_english, genres, score, episodes, type, synopsis } =
-    animeData || {
-      title: "",
-      title_english: "",
-      genres: [],
-      score: 0,
-      episodes: 0,
-      type: "",
-      synopsis: "",
-    };
-
+  const {
+    episodes,
+    genres,
+    score,
+    status,
+    synopsis,
+    title,
+    title_english,
+    title_synonyms,
+    type,
+  } = animeData;
+  const {
+    coverImage,
+    endDate,
+    nextEpisode,
+    posterImage,
+    reviews,
+    startDate,
+    studios,
+    tags,
+    trailer,
+  } = animeDetails;
   return (
     <AnimatePresence>
       <motion.div
@@ -233,6 +214,8 @@ export default function AnimeDescription() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
+        <title>{title}</title>
+
         {/* Hero Section */}
         <div className="relative h-[50vh] md:h-[70vh] overflow-hidden">
           <motion.img
@@ -269,7 +252,7 @@ export default function AnimeDescription() {
                   transition={{ delay: 0.3 }}
                   className="flex flex-wrap gap-2 mb-4 md:mb-6"
                 >
-                  {genres.map((genre) => (
+                  {genres.map((genre: any) => (
                     <Link key={genre.mal_id} to={`/genre/${genre.name}`}>
                       <span className="px-2 md:px-3 py-1 bg-zinc-800/80 rounded-full text-xs md:text-sm hover:bg-blue-600/80 transition-colors duration-300">
                         {genre.name}
@@ -297,7 +280,7 @@ export default function AnimeDescription() {
                     </div>
                   </div>
                 </div>
-                <Link to={`/episodes/${params.animeId}`}>
+                <Link to={`/episodes/${animeId}`}>
                   <div className="bg-zinc-800/40 backdrop-blur-sm rounded-2xl p-6 hover:bg-zinc-800/60 transition-all duration-300">
                     <div className="flex flex-col items-center gap-3">
                       <FaPlay className="text-blue-500 text-2xl" />
@@ -333,7 +316,7 @@ export default function AnimeDescription() {
                     </h3>
 
                     <div className="flex flex-wrap gap-3">
-                      {animeDetails?.studios?.map(
+                      {studios?.map(
                         (
                           studio: { name: string; isAnimationStudio: boolean },
                           index: number
@@ -408,31 +391,29 @@ export default function AnimeDescription() {
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-3xl font-bold">Main Characters</h2>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 p-4">
-                  {animeCharacters?.map((char) => (
-                    <Link
-                      key={char.character.mal_id}
-                      to={`/chars/${char.character.mal_id}`}
-                    >
-                      <motion.div className="relative group h-[320px] rounded-[2rem] cursor-pointer perspective-1000">
-                        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-zinc-900/50 to-zinc-900 rounded-[2rem] backdrop-blur-xl" />
-                        <div className="absolute -z-20 inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-[2rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                        <img
-                          src={char.character.images.jpg.image_url}
-                          alt={char.character.name}
-                          className="w-full h-full object-cover rounded-[2rem]"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent rounded-b-[2rem]">
-                          <h3 className="text-xl font-bold text-white">
-                            {char.character.name}
-                          </h3>
-                          <p className="text-sm text-zinc-400 mt-1">
-                            {char.role}
-                          </p>
-                        </div>
-                      </motion.div>
-                    </Link>
+                <div className="flex flex-wrap  w-[95%] gap-4 mx-auto">
+                  {characters?.map((char: any) => (
+                    <CharacterCard
+                      hreflink={`/character/${char.character.mal_id}`}
+                      name={char.character.name}
+                      imageUrl={char.character.images.jpg.image_url}
+                      role={char.role}
+                    />
+                  ))}
+                </div>
+              </section>
+              <section className="mb-12">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-3xl font-bold">Similar Anime</h2>
+                </div>
+                <div className="flex flex-wrap w-[95%] gap-4 mx-auto">
+                  {recommendations?.map(({ entry }) => (
+                    <AnimeCard
+                      key={entry.mal_id}
+                      imageUrl={entry.images?.webp?.image_url}
+                      title={entry.title}
+                      hreflink={`/anime/${entry.mal_id}`}
+                    />
                   ))}
                 </div>
               </section>

@@ -6,5 +6,7 @@ export default [
   route("upcoming", "./routes/upcoming.tsx"),
   route("about", "./routes/about.tsx"),
   route("anime/:animeId", "./routes/anime/$animeId.tsx"),
+  route("studio/:studioname", "./routes/studio/$studioname.tsx"),
   route("genre/:genrename", "./routes/genre/$genrename.tsx"),
+  route('character/:charid', './routes/character/$charid.tsx'),
 ] satisfies RouteConfig;
