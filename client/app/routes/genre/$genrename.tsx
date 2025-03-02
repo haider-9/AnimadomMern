@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import AnimeCard from "~/components/animecard";
+import Loader from "~/components/loader";
 
 interface AnimeData {
   mal_id: number;
@@ -88,21 +89,15 @@ export default function GenrePage() {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    window.scrollTo(0, 0,);
+    window.scrollTo(0, 0);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-2xl">Loading...</div>
-      </div>
-    );
-  }
+  if (loading) return <Loader/>
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 capitalize">{genrename} Anime</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
+      <div className="flex flex-wrap gap-5">
         {animeList.map((anime) => (
           <AnimeCard
             key={anime.mal_id}

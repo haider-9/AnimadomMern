@@ -1,73 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FaRegStar, FaPlay, FaCheckCircle, FaFilm } from "react-icons/fa";
-import { Link, useLoaderData } from "react-router"; // Using useLoaderData
+import { FaRegStar, FaPlay, FaFilm } from "react-icons/fa";
+import { Link } from "react-router"; // Using useLoaderData
 import AnimeCard from "~/components/animecard";
-import { Button } from "~/components/ui/button";
 import type { Route } from "./+types/$animeId";
 import CharacterCard from "~/components/charactercard";
-
-interface AnimeData {
-  title_english: string;
-  title: string;
-  episodes: number;
-  title_synonyms: string[];
-  synopsis: string;
-  score: number;
-  genres: Array<{ mal_id: number; name: string }>;
-  type: string;
-  status: string;
-}
-
-interface DateDetails {
-  year: number | null;
-  month: number | null;
-  day: number | null;
-}
-
-interface AnimeDetails {
-  coverImage: string;
-  posterImage: string;
-  startDate: DateDetails | null;
-  endDate: DateDetails | null;
-  nextEpisode: {
-    episode: number;
-    timeUntilAiring: number;
-  } | null;
-  reviews: Array<{ score: number; summary: string }>;
-  trailer: {
-    id: string;
-    site: string;
-    thumbnail: string;
-  } | null;
-  tags: Array<{ name: string; rank: number }>;
-  studios: Array<{ name: string; isAnimationStudio: boolean }>;
-}
-
-interface Character {
-  character: {
-    mal_id: number;
-    name: string;
-    images: {
-      jpg: {
-        image_url: string;
-      };
-    };
-  };
-  role: string;
-}
-
-interface Recommendation {
-  mal_id: number;
-  entry: {
-    mal_id: number;
-    title: string;
-    images: {
-      jpg: {
-        large_image_url: string;
-      };
-    };
-  };
-}
+import { useState } from "react";
 
 export async function loader({ params: { animeId } }: Route.LoaderArgs) {
   const fetchJikanData = async () => {
@@ -86,6 +23,14 @@ export async function loader({ params: { animeId } }: Route.LoaderArgs) {
       characters: charsResponse.data,
       recommendations: recsResponse.data,
     };
+  };
+  const fetchKitsuData = async (title: string) => {
+    const encodedTitle = encodeURIComponent(title);
+    const response = await fetch(
+      `https://kitsu.io/api/edge/anime?filter[text]=${encodedTitle}`
+    );
+    const data = await response.json();
+    return data.data[0];
   };
 
   const fetchAniListData = async (malId: string) => {
@@ -171,11 +116,14 @@ export async function loader({ params: { animeId } }: Route.LoaderArgs) {
 
   const jikanData = await fetchJikanData();
   const anilistData = await fetchAniListData(animeId);
-
+  const kitsuData = await fetchKitsuData(
+    jikanData.animeData.title_english || jikanData.animeData.title
+  );
   return {
     animeId,
     ...jikanData,
     animeDetails: anilistData,
+    kitsuData,
   };
 }
 
@@ -183,30 +131,13 @@ export default function AnimeDescription({
   loaderData,
   params: { animeId },
 }: Route.ComponentProps) {
-  const { animeData, characters, recommendations, animeDetails } = loaderData;
+  const { animeData, characters, recommendations, animeDetails, kitsuData } =
+    loaderData;
+  const [isGalleryExpanded, setIsGalleryExpanded] = useState(false);
 
-  const {
-    episodes,
-    genres,
-    score,
-    status,
-    synopsis,
-    title,
-    title_english,
-    title_synonyms,
-    type,
-  } = animeData;
-  const {
-    coverImage,
-    endDate,
-    nextEpisode,
-    posterImage,
-    reviews,
-    startDate,
-    studios,
-    tags,
-    trailer,
-  } = animeDetails;
+  const { episodes, genres, score, synopsis, title, title_english, type } =
+    animeData;
+  const { endDate, nextEpisode, startDate, studios } = animeDetails;
   return (
     <AnimatePresence>
       <motion.div
@@ -306,7 +237,6 @@ export default function AnimeDescription({
                   </div>
                 </div>
               </div>
-
               {/* Additional Info */}
               <div className="bg-zinc-800/40 backdrop-blur-sm rounded-2xl p-8 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -377,7 +307,6 @@ export default function AnimeDescription({
                   </div>
                 </div>
               </div>
-
               <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -386,28 +315,29 @@ export default function AnimeDescription({
                 <h2 className="text-2xl font-semibold mb-4">Synopsis</h2>
                 <p className="text-zinc-300 leading-relaxed">{synopsis}</p>
               </motion.section>
-
               <section className="mb-12">
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-3xl font-bold">Main Characters</h2>
                 </div>
                 <div className="flex flex-wrap  w-[95%] gap-4 mx-auto">
-                  {characters?.filter(char => char.role === "Main")?.map((char: any) => (
-                    <CharacterCard
-                      hreflink={`/character/${char.character.mal_id}`}
-                      name={char.character.name}
-                      imageUrl={char.character.images.jpg.image_url}
-                      role={char.role}
-                      animeAppearances={char.voice_actors.length}
-                    />
-                  ))}
+                  {characters
+                    ?.filter((char) => char.role === "Main")
+                    ?.map((char: any) => (
+                      <CharacterCard
+                        hreflink={`/character/${char.character.mal_id}`}
+                        name={char.character.name}
+                        imageUrl={char.character.images.jpg.image_url}
+                        role={char.role}
+                        animeAppearances={char.voice_actors.length}
+                      />
+                    ))}
                 </div>
               </section>
               <section className="mb-12">
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-3xl font-bold">Similar Anime</h2>
                 </div>
-                <div className="flex flex-wrap w-screen gap-4 mx-auto">
+                <div className="flex flex-wrap w-full gap-4 mx-auto">
                   {recommendations?.slice(0, 15)?.map(({ entry }) => (
                     <AnimeCard
                       key={entry.mal_id}
@@ -417,7 +347,8 @@ export default function AnimeDescription({
                     />
                   ))}
                 </div>
-              </section>            </div>
+              </section>{" "}
+            </div>
 
             {/* Right Sidebar */}
             <div className="lg:col-span-1">
@@ -490,6 +421,76 @@ export default function AnimeDescription({
                       )}
                   </motion.div>
                 )}
+                {/* Gallery Section */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 backdrop-blur-xl rounded-2xl p-6 border border-zinc-700/50 shadow-xl mt-4"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Gallery</h2>
+                    <button
+                      onClick={() => setIsGalleryExpanded(!isGalleryExpanded)}
+                      className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      {isGalleryExpanded ? "Show Less" : "Show More"}
+                    </button>
+                  </div>
+                  <div
+                    className={`grid gap-2 ${
+                      isGalleryExpanded ? "grid-cols-3" : "grid-cols-2"
+                    }`}
+                  >
+                    {kitsuData?.attributes?.posterImage &&
+                      [
+                        kitsuData.attributes.posterImage.original,
+                        kitsuData.attributes.posterImage.large,
+                        kitsuData.attributes.posterImage.medium,
+                        kitsuData.attributes.coverImage?.original,
+                        kitsuData.attributes.coverImage?.large,
+                        kitsuData.attributes.coverImage?.small,
+                      ]
+                        .filter(Boolean)
+                        .slice(0, isGalleryExpanded ? 15 : 4)
+                        .map((imageUrl, index) => (
+                          <motion.img
+                            key={index}
+                            src={imageUrl}
+                            alt={`Gallery ${index + 1}`}
+                            className={`rounded-lg w-full ${
+                              isGalleryExpanded ? "h-32" : "h-24"
+                            } object-cover hover:opacity-80 transition-opacity cursor-pointer`}
+                            layoutId={`gallery-image-${index}`}
+                            whileHover={{ scale: 1.02 }}
+                          />
+                        ))}
+                  </div>
+                </motion.div>
+
+                {/* Additional Info */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 backdrop-blur-xl rounded-2xl p-6 border border-zinc-700/50 shadow-xl mt-4"
+                >
+                  <h2 className="text-xl font-semibold mb-4">
+                    Additional Info
+                  </h2>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Age Rating</span>
+                      <span>{kitsuData?.attributes?.ageRating}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Popularity Rank</span>
+                      <span>#{kitsuData?.attributes?.popularityRank}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Rating Rank</span>
+                      <span>#{kitsuData?.attributes?.ratingRank}</span>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </div>
           </div>

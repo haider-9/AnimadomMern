@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams } from "react-router";
-import { FaHeart, FaMicrophone, FaStar, FaUser, FaBirthdayCake } from "react-icons/fa";
+import { FaHeart, FaStar, FaUser, FaBirthdayCake } from "react-icons/fa";
+import Loader from "~/components/loader";
 
 interface StaffData {
   id: number;
@@ -60,11 +61,13 @@ interface StaffData {
   };
 }
 
+
 export default function StaffDetails() {
   const params = useParams();
   const [staffData, setStaffData] = useState<StaffData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'characters' | 'media'>('characters');
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"characters" | "media">("characters");
   const [bannerImage, setBannerImage] = useState<string>("");
 
   useEffect(() => {
@@ -133,17 +136,32 @@ export default function StaffDetails() {
       try {
         const response = await fetch("https://graphql.anilist.co", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
           body: JSON.stringify({
             query,
             variables: { id: parseInt(params.id) },
           }),
         });
 
-        const { data } = await response.json();
-        setStaffData(data.Staff);
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const { data, errors } = await response.json();
         
-        // Set random banner image from media
+        if (errors) {
+          throw new Error(errors[0].message);
+        }
+
+        if (!data || !data.Staff) {
+          throw new Error("No data received from API");
+        }
+
+        setStaffData(data.Staff);
+
         if (data.Staff?.staffMedia?.nodes) {
           const mediaWithBanners = data.Staff.staffMedia.nodes.filter(
             (media) => media.bannerImage || media.coverImage.large
@@ -154,6 +172,7 @@ export default function StaffDetails() {
           }
         }
       } catch (error) {
+        setError(error instanceof Error ? error.message : "An unexpected error occurred");
         console.error("Error fetching staff data:", error);
       } finally {
         setLoading(false);
@@ -166,12 +185,20 @@ export default function StaffDetails() {
   }, [params.id]);
 
   if (loading) {
+    return<Loader/>
+  }
+
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-red-500/10 p-6 rounded-xl border border-red-500/20">
+          <h2 className="text-red-500 text-xl font-semibold mb-2">Error Loading Data</h2>
+          <p className="text-red-400">{error}</p>
+        </div>
       </div>
     );
   }
+
 
   if (!staffData) return null;
 
@@ -198,7 +225,7 @@ export default function StaffDetails() {
         <div className="container mx-auto px-4 -mt-32 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1">
-              <motion.div
+             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-6 border border-zinc-700/50"

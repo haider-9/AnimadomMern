@@ -11,6 +11,7 @@ export default function Collections() {
     Array<{
       title: string;
       images: string[];
+      slug: string;
     }>
   >([]);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +35,7 @@ export default function Collections() {
         const categories = categoriesData.data.map((c: any) => ({
           id: c.id,
           title: c.attributes.title,
+          slug: c.attributes.slug
         }));
 
         const collectionsData = await Promise.all(
@@ -50,7 +52,8 @@ export default function Collections() {
               .slice(0, 4);
 
             return {
-              title: `Top ${category.title} Anime`,
+              title: `${category.title}`,
+              slug: `${category.slug}`,
               images: validAnime.map(
                 (anime: any) => anime.attributes.posterImage.small
               ),
@@ -82,18 +85,25 @@ export default function Collections() {
       )}
 
       {error && <div className="text-red-500 text-center p-4">{error}</div>}
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {collections.map((collection, index) => (
+        {collections.map((collection, index) => {
+           console.log(collection)
+          return(
+          
           <CollectionCard
             key={`${collection.title}-${index}`}
-            title={collection.title}
+            title={`${collection.title} Anime`}
             backgroundImage={collection.images[0]}
             thumbnailImages={collection.images.slice(1)}
+            hreflink={`/genre/${collection.slug}`}
           />
-        ))}
+         
+        )
+      
+        })}
       </div>
-
+    
+    
       <div className="flex justify-center items-center mt-8 gap-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

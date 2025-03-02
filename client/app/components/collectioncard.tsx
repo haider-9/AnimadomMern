@@ -1,8 +1,10 @@
+import { Link } from "react-router";
+
 interface CollectionCardProps {
   title: string;
   backgroundImage?: string;
   thumbnailImages?: string[];
-  onClick?: () => void;
+  hreflink?: string;
 }
 
 export default function CollectionCard({
@@ -13,7 +15,7 @@ export default function CollectionCard({
     "https://dummyimage.com/100x150/666/fff&text=2",
     "https://dummyimage.com/100x150/999/fff&text=3",
   ],
-  onClick,
+  hreflink,
 }: CollectionCardProps) {
   return (
     <div className="relative w-[320px] h-[420px] cursor-pointer overflow-hidden rounded-3xl shadow-xl bg-black/30 group">
@@ -43,7 +45,6 @@ export default function CollectionCard({
               <img
                 src={img}
                 alt={`${title} thumbnail ${index + 1}`}
-                
                 className="object-cover h-full object-center"
               />
             </div>
@@ -55,13 +56,11 @@ export default function CollectionCard({
           {title}
         </h3>
 
-        {/* Button */}
-        <button
-          onClick={onClick}
-          className="mt-2 px-4 py-2 bg-white/20 text-white rounded-lg backdrop-blur-md hover:bg-white/30 transition"
-        >
-          View Collection
-        </button>
+        <Link to={hreflink}>
+          <button className="mt-2 px-4 py-2 bg-white/20 text-white cursor-pointer rounded-lg backdrop-blur-md hover:bg-white/30 transition">
+            View Collection
+          </button>
+        </Link>
       </div>
     </div>
   );

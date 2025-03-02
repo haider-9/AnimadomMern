@@ -292,7 +292,6 @@ export default function CharacterDetails() {
               ))}
             </div>
           </motion.div>
-          
         </div>
       </motion.div>
     </AnimatePresence>
