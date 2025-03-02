@@ -11,4 +11,5 @@ export default [
   route("voiceactor/:charid", "./routes/voiceactor/$charid.tsx"),
   route('character/:charid', './routes/character/$charid.tsx'),
   route('people/:id', './routes/people/$id.tsx'),
+  route("profile", "./routes/profile.tsx"),
 ] satisfies RouteConfig;
