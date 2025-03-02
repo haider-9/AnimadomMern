@@ -38,7 +38,7 @@ export default function Header() {
         <nav className="hidden md:block">
           {" "}
           {/* Hide on mobile, show on medium+ screens */}
-          <ul className="flex gap-6 text-neutral-300 text-sm uppercase tracking-wide">
+          <ul className="flex gap-6 text-neutral-300 text-sm tracking-wide">
             <li>
               <Link to="/" className="hover:text-white">
                 Home

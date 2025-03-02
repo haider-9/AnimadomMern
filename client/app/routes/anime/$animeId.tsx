@@ -145,7 +145,7 @@ export default function AnimeDescription({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <title>{title}</title>
+        <title>{title_english}</title>
 
         {/* Hero Section */}
         <div className="relative h-[50vh] md:h-[70vh] overflow-hidden">
@@ -160,7 +160,7 @@ export default function AnimeDescription({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-900" />
           <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
-            <div className="container mx-auto flex flex-col md:flex-row gap-4 md:gap-8">
+            <div className="container mx-auto flex flex-row gap-4 md:gap-8">
               <motion.img
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
