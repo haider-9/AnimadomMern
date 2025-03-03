@@ -4,218 +4,148 @@ import { Link, useParams } from "react-router";
 import { FaHeart, FaStar, FaUser, FaBirthdayCake } from "react-icons/fa";
 import Loader from "~/components/loader";
 
-interface StaffData {
-  id: number;
-  name: {
-    full: string;
-    native: string;
+interface PersonData {
+  mal_id: number;
+  name: string;
+  given_name: string;
+  family_name: string;
+  alternate_names: string[];
+  birthday: string;
+  favorites: number;
+  about: string;
+  images: {
+    jpg: {
+      image_url: string;
+    };
   };
-  description: string;
-  image: {
-    large: string;
-  };
-  favourites: number;
-  primaryOccupations: string[];
-  dateOfBirth: {
-    year: number | null;
-    month: number | null;
-    day: number | null;
-  };
-  characters: {
-    nodes: Array<{
-      id: number;
-      name: {
-        full: string;
+  voices: Array<{
+    role: string;
+    character: {
+      mal_id: number;
+      name: string;
+      images: {
+        jpg: {
+          image_url: string;
+        };
       };
-      image: {
-        large: string;
-      };
-      media: {
-        nodes: Array<{
-          id: number;
-          title: {
-            english: string;
-            romaji: string;
+      anime: {
+        mal_id: number;
+        title: string;
+        images: {
+          jpg: {
+            image_url: string;
           };
-          coverImage: {
-            large: string;
-          };
-        }>;
+        };
       };
-    }>;
-  };
-  staffMedia: {
-    nodes: Array<{
-      id: number;
-      title: {
-        english: string;
-        romaji: string;
+    };
+  }>;
+  anime: Array<{
+    position: string;
+    anime: {
+      mal_id: number;
+      title: string;
+      images: {
+        jpg: {
+          image_url: string;
+        };
       };
-      coverImage: {
-        large: string;
-      };
-      bannerImage: string;
-      averageScore: number;
-      type: string;
-    }>;
-  };
+      score: number;
+    };
+  }>;
 }
 
-
-export default function StaffDetails() {
-  const params = useParams();
-  const [staffData, setStaffData] = useState<StaffData | null>(null);
+export default function PersonDetails() {
+  const { id } = useParams<{ id: string }>();
+  const [personData, setPersonData] = useState<PersonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"characters" | "media">("characters");
-  const [bannerImage, setBannerImage] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"characters" | "media">(
+    "characters"
+  );
 
   useEffect(() => {
-    const fetchStaffData = async () => {
-      const query = `
-        query ($id: Int) {
-          Staff(id: $id) {
-            id
-            name {
-              full
-              native
-            }
-            description(asHtml: true)
-            image {
-              large
-            }
-            primaryOccupations
-            favourites
-            dateOfBirth {
-              year
-              month
-              day
-            }
-            characters(sort: FAVOURITES_DESC, perPage: 12) {
-              nodes {
-                id
-                name {
-                  full
-                }
-                image {
-                  large
-                }
-                media(perPage: 1) {
-                  nodes {
-                    id
-                    title {
-                      english
-                      romaji
-                    }
-                    coverImage {
-                      large
-                    }
-                  }
-                }
-              }
-            }
-            staffMedia(sort: POPULARITY_DESC, perPage: 12) {
-              nodes {
-                id
-                title {
-                  english
-                  romaji
-                }
-                coverImage {
-                  large
-                }
-                bannerImage
-                averageScore
-                type
-              }
-            }
-          }
-        }
-      `;
+    const fetchPersonData = async () => {
+      if (!id) {
+        setError("No ID provided");
+        setLoading(false);
+        return;
+      }
 
       try {
-        const response = await fetch("https://graphql.anilist.co", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
-          body: JSON.stringify({
-            query,
-            variables: { id: parseInt(params.id) },
-          }),
-        });
+        const response = await fetch(
+          `https://api.jikan.moe/v4/people/${id}/full`
+        );
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`);
         }
 
-        const { data, errors } = await response.json();
-        
-        if (errors) {
-          throw new Error(errors[0].message);
-        }
+        const { data } = await response.json();
 
-        if (!data || !data.Staff) {
+        if (!data) {
           throw new Error("No data received from API");
         }
 
-        setStaffData(data.Staff);
-
-        if (data.Staff?.staffMedia?.nodes) {
-          const mediaWithBanners = data.Staff.staffMedia.nodes.filter(
-            (media) => media.bannerImage || media.coverImage.large
-          );
-          if (mediaWithBanners.length > 0) {
-            const randomMedia = mediaWithBanners[Math.floor(Math.random() * mediaWithBanners.length)];
-            setBannerImage(randomMedia.bannerImage || randomMedia.coverImage.large);
-          }
-        }
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "An unexpected error occurred");
-        console.error("Error fetching staff data:", error);
+        setPersonData(data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred"
+        );
+        console.error("Error fetching person data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (params.id) {
-      fetchStaffData();
-    }
-  }, [params.id]);
+    fetchPersonData();
+  }, [id]);
 
   if (loading) {
-    return<Loader/>
+    return <Loader />;
   }
 
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-red-500/10 p-6 rounded-xl border border-red-500/20">
-          <h2 className="text-red-500 text-xl font-semibold mb-2">Error Loading Data</h2>
+          <h2 className="text-red-500 text-xl font-semibold mb-2">
+            Error Loading Data
+          </h2>
           <p className="text-red-400">{error}</p>
         </div>
       </div>
     );
   }
 
-
-  if (!staffData) return null;
+  if (!personData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-yellow-500/10 p-6 rounded-xl border border-yellow-500/20">
+          <h2 className="text-yellow-500 text-xl font-semibold mb-2">
+            No Data Found
+          </h2>
+          <p className="text-yellow-400">Could not find person with ID: {id}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <motion.div
+        key="person-details"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        className="min-h-screen pb-16"
       >
         <div className="relative h-[40vh] overflow-hidden">
           <motion.img
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5 }}
-            src={bannerImage || staffData.image.large}
-            alt={staffData.name.full}
+            src={personData.images.jpg.image_url}
+            alt={personData.name}
             className="absolute w-full h-full object-cover object-center"
             style={{ filter: "brightness(0.6) blur(8px)" }}
           />
@@ -225,49 +155,41 @@ export default function StaffDetails() {
         <div className="container mx-auto px-4 -mt-32 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1">
-             <motion.div
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-6 border border-zinc-700/50"
               >
                 <img
-                  src={staffData.image.large}
-                  alt={staffData.name.full}
+                  src={personData.images.jpg.image_url}
+                  alt={personData.name}
                   className="w-full rounded-xl shadow-xl mb-6"
                 />
 
                 <div className="space-y-4">
                   <div>
-                    <h1 className="text-2xl font-bold">{staffData.name.full}</h1>
-                    <p className="text-zinc-400">{staffData.name.native}</p>
+                    <h1 className="text-2xl font-bold">{personData.name}</h1>
+                    {personData.alternate_names?.length > 0 && (
+                      <p className="text-zinc-400">
+                        {personData.alternate_names[0]}
+                      </p>
+                    )}
                   </div>
 
-                  <div className="flex items-center gap-2 bg-pink-500/20 p-4 rounded-xl">
-                    <FaHeart className="text-pink-500" />
-                    <span className="text-pink-200 font-medium">
-                      {staffData.favourites.toLocaleString()} Favorites
-                    </span>
-                  </div>
-
-                  {staffData.primaryOccupations?.length > 0 && (
-                    <div className="bg-purple-500/20 p-4 rounded-xl">
-                      <FaUser className="text-purple-500 mb-2" />
-                      <div className="flex flex-wrap gap-2">
-                        {staffData.primaryOccupations.map((occupation, index) => (
-                          <span key={index} className="text-purple-200 text-sm bg-purple-500/20 px-3 py-1 rounded-full">
-                            {occupation}
-                          </span>
-                        ))}
-                      </div>
+                  {personData.favorites > 0 && (
+                    <div className="flex items-center gap-2 bg-pink-500/20 p-4 rounded-xl">
+                      <FaHeart className="text-pink-500" />
+                      <span className="text-pink-200 font-medium">
+                        {personData.favorites.toLocaleString()} Favorites
+                      </span>
                     </div>
                   )}
 
-                  {staffData.dateOfBirth.month && (
+                  {personData.birthday && (
                     <div className="flex items-center gap-2 bg-zinc-700/30 p-4 rounded-xl">
                       <FaBirthdayCake className="text-zinc-400" />
                       <span className="text-zinc-300">
-                        {`${staffData.dateOfBirth.month}/${staffData.dateOfBirth.day}`}
-                        {staffData.dateOfBirth.year && `/${staffData.dateOfBirth.year}`}
+                        {new Date(personData.birthday).toLocaleDateString()}
                       </span>
                     </div>
                   )}
@@ -282,31 +204,28 @@ export default function StaffDetails() {
                 className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
               >
                 <h2 className="text-2xl font-semibold mb-4">About</h2>
-                <div
-                  className="text-zinc-300 leading-relaxed prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html: staffData.description || "No description available.",
-                  }}
-                />
+                <div className="text-zinc-300 leading-relaxed prose prose-invert max-w-none">
+                  {personData.about || "No description available."}
+                </div>
               </motion.div>
 
               <div className="flex gap-4">
                 <button
-                  onClick={() => setActiveTab('characters')}
+                  onClick={() => setActiveTab("characters")}
                   className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                    activeTab === 'characters'
-                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/25'
-                      : 'bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80'
+                    activeTab === "characters"
+                      ? "bg-purple-500 text-white shadow-lg shadow-purple-500/25"
+                      : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80"
                   }`}
                 >
                   Voice Acting Roles
                 </button>
                 <button
-                  onClick={() => setActiveTab('media')}
+                  onClick={() => setActiveTab("media")}
                   className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                    activeTab === 'media'
-                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/25'
-                      : 'bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80'
+                    activeTab === "media"
+                      ? "bg-purple-500 text-white shadow-lg shadow-purple-500/25"
+                      : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80"
                   }`}
                 >
                   Media
@@ -314,7 +233,7 @@ export default function StaffDetails() {
               </div>
 
               <AnimatePresence mode="wait">
-                {activeTab === 'characters' && (
+                {activeTab === "characters" && personData.voices?.length > 0 ? (
                   <motion.div
                     key="characters"
                     initial={{ opacity: 0, y: 20 }}
@@ -323,34 +242,46 @@ export default function StaffDetails() {
                     transition={{ duration: 0.3 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                   >
-                    {staffData.characters.nodes.map((character) => (
+                    {personData.voices.map((voice) => (
                       <Link
-                        to={`/character/${character.id}`}
-                        key={character.id}
+                        to={`/character/${voice.character.mal_id}`}
+                        key={`${voice.character.mal_id}-${voice.anime.mal_id}`}
                         className="group bg-zinc-800/40 rounded-xl overflow-hidden hover:bg-zinc-700/40 transition-all duration-300"
                       >
                         <div className="flex items-center gap-4 p-4">
                           <img
-                            src={character.image.large}
-                            alt={character.name.full}
+                            src={voice.character.images.jpg.image_url}
+                            alt={voice.character.name}
                             className="w-20 h-28 object-cover rounded-lg transition-transform group-hover:scale-105"
                           />
                           <div className="flex-1">
                             <h3 className="font-medium text-lg text-white group-hover:text-purple-300 transition-colors">
-                              {character.name.full}
+                              {voice.character.name}
                             </h3>
                             <p className="text-sm text-zinc-400 mt-1">
-                              {character.media.nodes[0]?.title.english || 
-                               character.media.nodes[0]?.title.romaji}
+                              {voice.anime.title}
                             </p>
                           </div>
                         </div>
                       </Link>
                     ))}
                   </motion.div>
-                )}
+                ) : activeTab === "characters" ? (
+                  <motion.div
+                    key="no-characters"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50 text-center"
+                  >
+                    <p className="text-zinc-400">
+                      No character roles found for this person.
+                    </p>
+                  </motion.div>
+                ) : null}
 
-                {activeTab === 'media' && (
+                {activeTab === "media" && personData.anime?.length > 0 ? (
                   <motion.div
                     key="media"
                     initial={{ opacity: 0, y: 20 }}
@@ -359,34 +290,52 @@ export default function StaffDetails() {
                     transition={{ duration: 0.3 }}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                   >
-                    {staffData.staffMedia.nodes.map((media) => (
+                    {personData.anime.map((entry) => (
                       <Link
-                        to={`/anime/${media.id}`}
-                        key={media.id}
+                        to={`/anime/${entry.anime.mal_id}`}
+                        key={entry.anime.mal_id}
                         className="group bg-zinc-800/40 rounded-xl overflow-hidden hover:bg-zinc-700/40 transition-all duration-300"
                       >
                         <div className="flex items-center gap-4 p-4">
                           <img
-                            src={media.coverImage.large}
-                            alt={media.title.english || media.title.romaji}
+                            src={entry.anime.images.jpg.image_url}
+                            alt={entry.anime.title}
                             className="w-20 h-28 object-cover rounded-lg transition-transform group-hover:scale-105"
                           />
                           <div className="flex-1">
                             <h3 className="font-medium text-lg text-white group-hover:text-purple-300 transition-colors">
-                              {media.title.english || media.title.romaji}
+                              {entry.anime.title}
                             </h3>
-                            <div className="flex items-center gap-2 mt-2">
-                              <FaStar className="text-yellow-500" />
-                              <span className="text-yellow-200">
-                                {(media.averageScore / 10).toFixed(1)}
-                              </span>
-                            </div>
+                            {entry.anime.score && (
+                              <div className="flex items-center gap-2 mt-2">
+                                <FaStar className="text-yellow-500" />
+                                <span className="text-yellow-200">
+                                  {entry.anime.score.toFixed(1)}
+                                </span>
+                              </div>
+                            )}
+                            <p className="text-sm text-zinc-400 mt-1">
+                              {entry.position}
+                            </p>
                           </div>
                         </div>
                       </Link>
                     ))}
                   </motion.div>
-                )}
+                ) : activeTab === "media" ? (
+                  <motion.div
+                    key="no-media"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50 text-center"
+                  >
+                    <p className="text-zinc-400">
+                      No media found for this person.
+                    </p>
+                  </motion.div>
+                ) : null}
               </AnimatePresence>
             </div>
           </div>

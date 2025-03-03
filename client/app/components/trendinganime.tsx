@@ -68,7 +68,7 @@ export default function TrendingAnime() {
   return (
     <section className="py-8">
       <h2 className="text-2xl font-bold mb-6 px-4">Trending Now</h2>
-      <div className="flex flex-wrap justify-center gap-4 mx-auto">
+      <div className="flex flex-wrap max-md:justify-center gap-4 md:w-[95%] mx-auto">
         {trendingAnime.map((anime) => (
           <AnimeCard
             key={anime.idMal}
