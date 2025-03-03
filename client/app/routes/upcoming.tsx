@@ -1,5 +1,6 @@
 import AnimeCard from "../components/AnimeCard";
 import { useEffect, useState } from "react";
+import Loading from "~/components/loader";
 
 export default function TrendingAnime() {
   interface Anime {
@@ -80,6 +81,9 @@ export default function TrendingAnime() {
     };
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
+  }
+  if(isLoading) {
+    return <Loading />;
   }
 
   return (

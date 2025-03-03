@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams } from "react-router";
-import { FaHeart, FaStar, FaUser, FaBirthdayCake } from "react-icons/fa";
+import { FaHeart, FaStar, FaBirthdayCake } from "react-icons/fa";
 import Loader from "~/components/loader";
 
 interface PersonData {
@@ -106,7 +106,9 @@ export default function PersonDetails() {
 
   if (error) {
     return (
+      
       <div className="min-h-screen flex items-center justify-center">
+        
         <div className="bg-red-500/10 p-6 rounded-xl border border-red-500/20">
           <h2 className="text-red-500 text-xl font-semibold mb-2">
             Error Loading Data
@@ -131,7 +133,11 @@ export default function PersonDetails() {
   }
 
   return (
+    <>
+    <title>{`AnimaDom | ${personData.name}`}</title>
+    
     <AnimatePresence mode="wait">
+
       <motion.div
         key="person-details"
         initial={{ opacity: 0 }}
@@ -189,7 +195,14 @@ export default function PersonDetails() {
                     <div className="flex items-center gap-2 bg-zinc-700/30 p-4 rounded-xl">
                       <FaBirthdayCake className="text-zinc-400" />
                       <span className="text-zinc-300">
-                        {new Date(personData.birthday).toLocaleDateString()}
+                        {new Date(personData.birthday).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
                       </span>
                     </div>
                   )}
@@ -240,15 +253,15 @@ export default function PersonDetails() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto"
                   >
                     {personData.voices.map((voice) => (
                       <Link
                         to={`/character/${voice.character.mal_id}`}
                         key={`${voice.character.mal_id}-${voice.anime.mal_id}`}
-                        className="group bg-zinc-800/40 rounded-xl overflow-hidden hover:bg-zinc-700/40 transition-all duration-300"
+                        className="group bg-zinc-800/40 rounded-xl overflow-hidden hover:bg-zinc-700/40 transition-all duration-300 "
                       >
-                        <div className="flex items-center gap-4 p-4">
+                        <div className="flex items-center  gap-4 p-4">
                           <img
                             src={voice.character.images.jpg.image_url}
                             alt={voice.character.name}
@@ -288,7 +301,7 @@ export default function PersonDetails() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto"
                   >
                     {personData.anime.map((entry) => (
                       <Link
@@ -342,5 +355,6 @@ export default function PersonDetails() {
         </div>
       </motion.div>
     </AnimatePresence>
+    </>
   );
 }

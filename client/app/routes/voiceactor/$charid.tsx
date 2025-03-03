@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import CharacterCard from "~/components/charactercard";
+import Loader from '~/components/loader';
 
 export default function VoiceActorPage() {
   const { charid } = useParams();
@@ -24,10 +25,12 @@ export default function VoiceActorPage() {
     fetchVoiceActors();
   }, [charid]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
   if (error) return <div>Error: {error}</div>;
 
   return (
+    <>
+    <title>{`AnimaDom | Voice Actors of `}</title>
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Voice Actors</h1>
       <div className="flex flex-wrap gap-6">
@@ -43,5 +46,6 @@ export default function VoiceActorPage() {
         ))}
       </div>
     </div>
+    </>
   );
 }

@@ -112,9 +112,6 @@ export default function Header() {
 
       {/* Auth Buttons */}
       <div className="flex gap-2">
-        <Button size="sm" variant="outline">
-          Log In
-        </Button>
         <Button size="sm">Get Started</Button>
       </div>
 

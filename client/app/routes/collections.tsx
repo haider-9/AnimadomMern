@@ -1,7 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import CollectionCard from "../components/collectioncard";
+import Loading from "~/components/loader";
 
 const KITSU_CATEGORIES_API = "https://kitsu.io/api/edge/categories";
 const KITSU_ANIME_API = "https://kitsu.io/api/edge/anime";
@@ -35,7 +34,7 @@ export default function Collections() {
         const categories = categoriesData.data.map((c: any) => ({
           id: c.id,
           title: c.attributes.title,
-          slug: c.attributes.slug
+          slug: c.attributes.slug,
         }));
 
         const collectionsData = await Promise.all(
@@ -78,32 +77,24 @@ export default function Collections() {
     <div className="min-h-screen p-8">
       <title>Collections | Animadom</title>
 
-      {loading && (
-        <div className="flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      )}
+      {loading && <Loading />}
 
       {error && <div className="text-red-500 text-center p-4">{error}</div>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {collections.map((collection, index) => {
-           console.log(collection)
-          return(
-          
-          <CollectionCard
-            key={`${collection.title}-${index}`}
-            title={`${collection.title} Anime`}
-            backgroundImage={collection.images[0]}
-            thumbnailImages={collection.images.slice(1)}
-            hreflink={`/genre/${collection.slug}`}
-          />
-         
-        )
-      
+          console.log(collection);
+          return (
+            <CollectionCard
+              key={`${collection.title}-${index}`}
+              title={`${collection.title} Anime`}
+              backgroundImage={collection.images[0]}
+              thumbnailImages={collection.images.slice(1)}
+              hreflink={`/genre/${collection.slug}`}
+            />
+          );
         })}
       </div>
-    
-    
+
       <div className="flex justify-center items-center mt-8 gap-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
