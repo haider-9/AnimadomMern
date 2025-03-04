@@ -47,26 +47,25 @@ export default function TrendingAnime() {
 
   return (
     <>
-    <title>Animadom | Top Rated Anime</title>
-    <section className="py-8">
-      <div className="flex items-center justify-between mb-6 px-4">
-        <h2 className="text-2xl font-bold">Top Rated Anime</h2>
-        <Button asChild>
-          <Link to="/top-rated">See All</Link>
-        </Button>
-      </div>
-      <div className="flex flex-wrap gap-4 justify-center mx-auto">
-        {trendingAnime.map((anime) => (
-          <AnimeCard
-            key={anime.mal_id}
-            title={anime.title}
-            imageUrl={anime.images.jpg.large_image_url}
-            hreflink={`/anime/${anime.mal_id}`}
-            score={anime.score}
-          />
-        ))}
-      </div>
-    </section>
+      <section className="py-8">
+        <div className="flex items-center justify-between mb-6 px-4">
+          <h2 className="text-2xl font-bold">Top Rated Anime</h2>
+          <Button asChild>
+            <Link to="/top-rated">See All</Link>
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-4 justify-center mx-auto">
+          {trendingAnime.map((anime) => (
+            <AnimeCard
+              key={anime.mal_id}
+              title={anime.title}
+              imageUrl={anime.images.jpg.large_image_url}
+              hreflink={`/anime/${anime.mal_id}`}
+              score={anime.score}
+            />
+          ))}
+        </div>
+      </section>
     </>
   );
 }
