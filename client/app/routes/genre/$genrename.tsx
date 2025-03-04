@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import AnimeCard from "~/components/animecard";
 import Loader from "~/components/loader";
+import { Button } from "~/components/ui/button";
 
 interface AnimeData {
   mal_id: number;
@@ -92,9 +93,12 @@ export default function GenrePage() {
     window.scrollTo(0, 0);
   };
 
-  if (loading) return <Loader/>
+  if (loading) return <Loader />;
 
   return (
+    <>
+    <title>{genrename} Anime</title>
+    
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 capitalize">{genrename} Anime</h1>
       <div className="flex flex-wrap gap-5">
@@ -107,27 +111,54 @@ export default function GenrePage() {
           />
         ))}
       </div>
-
       {/* Pagination Controls */}
-      <div className="flex justify-center gap-4 mt-8">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <span className="px-4 py-2">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-        >
-          Next
-        </button>
+
+      <div className="mt-8 flex justify-center">
+        <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+
+          {[...Array(totalPages)].map((_, index) => {
+            if (
+              index === 0 ||
+              index === totalPages - 1 ||
+              (index >= currentPage - 2 && index <= currentPage + 2)
+            ) {
+              return (
+                <Button
+                  key={index + 1}
+                  variant={currentPage === index + 1 ? "default" : "outline"}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </Button>
+              );
+            }
+            if (index === currentPage - 3 || index === currentPage + 3) {
+              return (
+                <span key={index} className="text-white">
+                  ...
+                </span>
+              );
+            }
+            return null;
+          })}
+
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import AnimeCard from "~/components/animecard";
 import { cn } from "~/lib/utils";
+import Loading from '~/components/loader';
 
 interface AnimeData {
   idMal: number;
@@ -100,13 +101,13 @@ export default function StudioPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-2xl">Loading...</div>
-      </div>
+     <Loading />
     );
   }
 
   return (
+    <>
+    <title>{studioname} Anime</title>
     <div className=" mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 capitalize">
         Anime by {studioname}
@@ -162,5 +163,6 @@ export default function StudioPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

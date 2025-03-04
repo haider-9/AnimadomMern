@@ -18,13 +18,13 @@ export default function CollectionCard({
   hreflink,
 }: CollectionCardProps) {
   return (
-    <div className="relative w-[320px] h-[420px] cursor-pointer overflow-hidden rounded-3xl shadow-xl bg-black/30 group">
+    <div className="relative border w-[320px] h-[420px] cursor-pointer overflow-hidden rounded-3xl shadow-xl bg-black/30 group">
       {/* Blurred Background */}
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={backgroundImage}
           alt={`${title} background`}
-          className="object-cover object-center blur-[2px] brightness-50"
+          className=" blur-[1px] brightness-50 object-cover object-center size-full"
         />
       </div>
 

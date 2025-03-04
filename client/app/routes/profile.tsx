@@ -30,7 +30,7 @@ const collections = [
 export default function Profile() {
   return (
     <main className="py-18 space-y-20">
-      <title>{`${USER_NAME} | Animadom`}</title>
+      <title>{` Animadom | ${USER_NAME}`}</title>
 
       <div className="mb-8 relative">
         <img

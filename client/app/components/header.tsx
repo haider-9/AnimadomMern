@@ -1,5 +1,5 @@
 import { LucideTv, Search, User } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { FaSearch, FaRegTimesCircle } from "react-icons/fa";
@@ -13,11 +13,7 @@ import {
 export default function Header() {
   const [search, setSearch] = useState("");
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const handleSearch = () => {
-    if (search.trim()) {
-    } else {
-    }
-  };
+  const navigate = useNavigate();
   return (
     <div className="w-full py-4 px-6 flex justify-between items-center z-50 border-b">
       {/* Left Section: Logo + Nav */}
@@ -64,7 +60,7 @@ export default function Header() {
       </div>
 
       {/* Right Section: Search + Actions */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4  w-full max-w-lg">
         {/* Search Bar */}
         <div className="relative">
           <div
@@ -90,7 +86,13 @@ export default function Header() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter" && search.trim()) {
+                      navigate(`/search/${encodeURIComponent(search.trim())}`);
+                      setIsSearchExpanded(false);
+                      setSearch("");
+                    }
+                  }}
                   placeholder="Search..."
                   className="w-full px-3 py-2.5 bg-transparent text-sm text-white placeholder-gray-400 focus:outline-none"
                   autoFocus
@@ -111,10 +113,12 @@ export default function Header() {
       </div>
 
       {/* Auth Buttons */}
-      <div className="flex gap-2">
-        <Button size="sm">Get Started</Button>
-      </div>
 
+      <div className="flex gap-2">
+        <Link to="/getstarted">
+          <Button size="sm">Get Started</Button>
+        </Link>
+      </div>
       {/* User Profile Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -123,7 +127,9 @@ export default function Header() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white">
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <Link to="/profile">
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+          </Link>
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Logout</DropdownMenuItem>
         </DropdownMenuContent>

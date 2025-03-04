@@ -30,7 +30,7 @@ export default function VoiceActorPage() {
 
   return (
     <>
-    <title>{`AnimaDom | Voice Actors of `}</title>
+    <title>{`AnimaDom | Voice Actors of ${voiceActors.person.name} `}</title>
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Voice Actors</h1>
       <div className="flex flex-wrap gap-6">

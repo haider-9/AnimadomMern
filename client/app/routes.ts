@@ -12,5 +12,9 @@ export default [
   route('character/:charid', './routes/character/$charid.tsx'),
   route('people/:id', './routes/people/$id.tsx'),
   route("profile", "./routes/profile.tsx"),
-  route('weeb', './routes/weeb.tsx'),
+  route('getstarted', './routes/weeb.tsx'),
+  route('morecharacters/:animeid', './routes/morecharacters/$animeid.tsx'),
+  route('top-rated', './routes/top-rated.tsx'),
+  route('trending', './routes/airing.tsx'),
+  route('search/:query', './routes/search/$query.tsx'),
 ] satisfies RouteConfig;

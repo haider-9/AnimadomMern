@@ -1,5 +1,8 @@
-import AnimeCard from "../components/AnimeCard";
+import AnimeCard from "~/components/AnimeCard";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import Loading from "../components/loader";
+import { Button } from "~/components/ui/button";
 
 interface Anime {
   mal_id: number;
@@ -19,7 +22,9 @@ export default function TrendingAnime() {
   useEffect(() => {
     const fetchTrendingAnime = async () => {
       try {
-        const response = await fetch("https://api.jikan.moe/v4/top/anime?limit=20");
+        const response = await fetch(
+          "https://api.jikan.moe/v4/top/anime?limit=20"
+        );
         const data = await response.json();
         setTrendingAnime(data.data);
       } catch (err) {
@@ -36,11 +41,21 @@ export default function TrendingAnime() {
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
   }
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
+    <>
+    <title>Animadom | Top Rated Anime</title>
     <section className="py-8">
-      <h2 className="text-2xl font-bold mb-6 px-4">Top Rated Anime</h2>
-      <div className="flex flex-wrap gap-4 mx-auto">
+      <div className="flex items-center justify-between mb-6 px-4">
+        <h2 className="text-2xl font-bold">Top Rated Anime</h2>
+        <Button asChild>
+          <Link to="/top-rated">See All</Link>
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-4 justify-center mx-auto">
         {trendingAnime.map((anime) => (
           <AnimeCard
             key={anime.mal_id}
@@ -52,5 +67,6 @@ export default function TrendingAnime() {
         ))}
       </div>
     </section>
+    </>
   );
 }

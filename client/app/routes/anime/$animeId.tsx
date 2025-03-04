@@ -5,9 +5,12 @@ import AnimeCard from "~/components/animecard";
 import type { Route } from "./+types/$animeId";
 import CharacterCard from "~/components/charactercard";
 import { useState } from "react";
-import { Loader } from "lucide-react";
+import Loading from "~/components/loader";
+import { Button } from "~/components/ui/button";
 
-export async function clientLoader({ params: { animeId } }: Route.ClientLoaderArgs) {
+export async function clientLoader({
+  params: { animeId },
+}: Route.ClientLoaderArgs) {
   const fetchJikanData = async () => {
     const responses = await Promise.all([
       fetch(`https://api.jikan.moe/v4/anime/${animeId}`),
@@ -128,7 +131,7 @@ export async function clientLoader({ params: { animeId } }: Route.ClientLoaderAr
   };
 }
 
-export const HydrateFallback = () => <Loader className="animate-spin"/>
+export const HydrateFallback = () => <Loading />;
 
 export default function AnimeDescription({
   loaderData,
@@ -321,6 +324,11 @@ export default function AnimeDescription({
               <section className="mb-12">
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-3xl font-bold">Main Characters</h2>
+                  <Link to={`/morecharacters/${animeId}`}>
+                    <Button variant="outline" className="text-white">
+                      View All Characters
+                    </Button>
+                  </Link>
                 </div>
                 <div className="flex flex-wrap  w-[95%] gap-4 mx-auto">
                   {characters

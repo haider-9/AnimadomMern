@@ -1,5 +1,7 @@
-import AnimeCard from "../components/AnimeCard";
+import AnimeCard from "~/components/AnimeCard";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { Link } from "react-router";
 
 export default function TrendingAnime() {
   interface Anime {
@@ -67,12 +69,19 @@ export default function TrendingAnime() {
 
   return (
     <section className="py-8">
-      <h2 className="text-2xl font-bold mb-6 px-4">Trending Now</h2>
-      <div className="flex flex-wrap max-md:justify-center gap-4 md:w-[95%] mx-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold mb-6 px-4">Trending Now</h2>
+        <Link to='/trending'>
+        <Button variant="default" size="sm">
+          See All
+        </Button>
+        </Link>
+      </div>
+      <div className="flex flex-wrap max-md:justify-center justify-center gap-4 md:w-[95%] mx-auto">
         {trendingAnime.map((anime) => (
           <AnimeCard
             key={anime.idMal}
-            title={anime.title.english||anime.title.romaji}
+            title={anime.title.english || anime.title.romaji}
             imageUrl={anime.coverImage.large}
             hreflink={`/anime/${anime.idMal}`}
             score={anime.averageScore}

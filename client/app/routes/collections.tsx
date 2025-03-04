@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CollectionCard from "../components/collectioncard";
 import Loading from "~/components/loader";
+import { Button } from "~/components/ui/button";
 
 const KITSU_CATEGORIES_API = "https://kitsu.io/api/edge/categories";
 const KITSU_ANIME_API = "https://kitsu.io/api/edge/anime";
@@ -15,8 +16,14 @@ export default function Collections() {
   >([]);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const collectionsPerPage = 20;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const fetchAnimeCollections = async () => {
@@ -30,6 +37,7 @@ export default function Collections() {
         if (!categoriesResponse.ok)
           throw new Error("Failed to fetch categories");
         const categoriesData = await categoriesResponse.json();
+        setTotalPages(Math.ceil(categoriesData.data.length / collectionsPerPage));
 
         const categories = categoriesData.data.map((c: any) => ({
           id: c.id,
@@ -75,42 +83,67 @@ export default function Collections() {
 
   return (
     <div className="min-h-screen p-8">
-      <title>Collections | Animadom</title>
+      <title>Animadom | Collections </title>
 
       {loading && <Loading />}
 
       {error && <div className="text-red-500 text-center p-4">{error}</div>}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {collections.map((collection, index) => {
-          console.log(collection);
-          return (
-            <CollectionCard
-              key={`${collection.title}-${index}`}
-              title={`${collection.title} Anime`}
-              backgroundImage={collection.images[0]}
-              thumbnailImages={collection.images.slice(1)}
-              hreflink={`/genre/${collection.slug}`}
-            />
-          );
-        })}
+      <div className="flex flex-wrap justify-center gap-4">
+        {collections.map((collection, index) => (
+          <CollectionCard
+            key={`${collection.title}-${index}`}
+            title={`${collection.title} Anime`}
+            backgroundImage={collection.images[0]}
+            thumbnailImages={collection.images.slice(1)}
+            hreflink={`/genre/${collection.slug}`}
+          />
+        ))}
       </div>
 
-      <div className="flex justify-center items-center mt-8 gap-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1 || loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="mx-4">Page {currentPage}</span>
-        <button
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
-        >
-          Next
-        </button>
+      <div className="mt-8 flex justify-center">
+        <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1 || loading}
+          >
+            Previous
+          </Button>
+
+          {[...Array(totalPages)].map((_, index) => {
+            if (
+              index === 0 ||
+              index === totalPages - 1 ||
+              (index >= currentPage - 2 && index <= currentPage + 2)
+            ) {
+              return (
+                <Button
+                  key={index + 1}
+                  variant={currentPage === index + 1 ? "default" : "outline"}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </Button>
+              );
+            }
+            if (index === currentPage - 3 || index === currentPage + 3) {
+              return (
+                <span key={index} className="text-white">
+                  ...
+                </span>
+              );
+            }
+            return null;
+          })}
+
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || loading}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
