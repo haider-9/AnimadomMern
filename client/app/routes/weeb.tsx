@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 // Define types for our form state
 type FormState = "signup" | "signin";
 interface FormEvent {
@@ -47,6 +48,7 @@ const AuthForm: React.FC = () => {
   };
 
   const handlesignup = async (e: React.FormEvent) => {
+    e.preventDefault(); // Add this
     try {
       const response = await signup(signupData);
       console.log("signup response", response);
@@ -56,12 +58,19 @@ const AuthForm: React.FC = () => {
   };
 
   const handlelogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       const response = await login(loginData);
-      console.log("login response", response);
-      navigate("/profile");
+      console.log("Login Response:", response);
+      if (response && response.password==loginData.password) {
+        toast.success("Login successful!");
+        navigate("/profile");
+      } else {
+        toast.error("Invalid credentials");
+      }
     } catch (error) {
-      console.log("error", error);
+      toast.error("Login failed. Please try again.");
+      console.error("Error:", error);
     }
   };
 
@@ -170,16 +179,15 @@ const AuthForm: React.FC = () => {
                         </div>
                         <div>
                           <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="password"
+                            <input
+                              type="password"
+                              id="password"
                               name="password"
-                              className="block text-sm font-medium"
-                              style={{ marginBottom: "0.5rem" }}
-                              defaultValue={loginData.password}
+                              value={loginData.password}
                               onChange={handlogindata}
-                            >
-                              Password
-                            </label>
+                              className=""
+                              placeholder="Password"
+                            />
                             <a
                               href="#"
                               className="text-sm font-medium text-violet-600 hover:text-violet-500"
@@ -282,6 +290,8 @@ const AuthForm: React.FC = () => {
                               id="name"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="John Doe"
+                              value={signupData.name}
+                              onChange={handleSignupdata}
                             />
                           </div>
                         </div>
@@ -298,6 +308,8 @@ const AuthForm: React.FC = () => {
                               id="signup-email"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="your.email@example.com"
+                              value={signupData.email}
+                              onChange={handleSignupdata}
                             />
                           </div>
                         </div>
@@ -314,6 +326,8 @@ const AuthForm: React.FC = () => {
                               id="signup-password"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="••••••••"
+                              value={signupData.password}
+                              onChange={handleSignupdata}
                             />
                           </div>
                         </div>
@@ -330,6 +344,8 @@ const AuthForm: React.FC = () => {
                               id="confirm-password"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="••••••••"
+                              value={signupData.confirmPassword}
+                              onChange={handleSignupdata}
                             />
                           </div>
                         </div>

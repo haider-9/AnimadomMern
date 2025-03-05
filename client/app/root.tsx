@@ -11,6 +11,8 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import Header from "./components/header";
 import Footer from "./components/footer";
+import { Toaster } from 'react-hot-toast';
+
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -46,11 +48,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
-
-export default function App() {
-  return <Outlet />;
-}
-
+  export default function App() {
+    return (
+      <>
+        <Toaster position="top-right" />
+        <Outlet />
+      </>
+    );
+  }
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
