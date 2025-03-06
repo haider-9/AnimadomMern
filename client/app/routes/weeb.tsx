@@ -60,7 +60,8 @@ const AuthForm: React.FC = () => {
         return;
       }
       toast.success("Signup successful!");
-      navigate(`/user/${response.name}`);
+      const { user } = response;
+      navigate(`/user/${user.name}`);
     } catch (error) {
       console.log("error", error);
     }
