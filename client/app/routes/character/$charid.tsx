@@ -48,6 +48,11 @@ interface CharacterData {
     }>;
   };
 }
+interface GalleryImage {
+  jpg: {
+    image_url: string;
+  };
+}
 
 export default function CharacterDetails({ params }: Route.ComponentProps) {
   const [characterData, setCharacterData] = useState<CharacterData | null>(
@@ -56,6 +61,8 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
   const [bannerImage, setBannerImage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [isGalleryExpanded, setIsGalleryExpanded] = useState(false);
 
   useEffect(() => {
     const fetchCharacterData = async () => {
@@ -136,13 +143,29 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
       }
     }
   }, [characterData]);
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await fetch(
+          `https://api.jikan.moe/v4/characters/${params.charid}/pictures`
+        );
+        const data = await response.json();
+        setGalleryImages(data.data);
+      } catch (error) {
+        console.error("Error fetching gallery:", error);
+      }
+    };
 
+    if (params.charid) {
+      fetchGallery();
+    }
+  }, [params.charid]);
   if (!characterData) return null;
   if (isLoading) return <Loading />;
 
   return (
     <>
-      <title>{`Animadom|${characterData.name.full} `}</title>
+      <title>{`Animadom | ${characterData.name.full} `}</title>
 
       <AnimatePresence>
         <motion.div
@@ -285,6 +308,50 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                           </button>
                         </div>
                       )}
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="mt-8 bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
+                >
+                  <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
+                  <div className="relative">
+                    <div
+                      className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ${
+                        !isGalleryExpanded &&
+                        "max-h-[600px] overflow-hidden relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-24 after:bg-gradient-to-t after:from-zinc-800 after:to-transparent"
+                      }`}
+                    >
+                      {galleryImages.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image.jpg.image_url}
+                          alt={`${characterData?.name.full} gallery image ${
+                            index + 1
+                          }`}
+                          className="w-full h-64 object-cover rounded-xl hover:scale-105 transition-transform duration-300"
+                        />
+                      ))}
+                    </div>
+                    {galleryImages.length > 8 && (
+                      <div
+                        className={`absolute left-1/2 -translate-x-1/2 ${
+                          !isGalleryExpanded && "-translate-y-1/2"
+                        }`}
+                      >
+                        <button
+                          onClick={() =>
+                            setIsGalleryExpanded(!isGalleryExpanded)
+                          }
+                          className="mt-2 px-6 py-2 text-sm text-white hover:text-zinc-100 transition-all duration-200 mx-auto bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold cursor-pointer inline-flex gap-1 items-center shadow-lg hover:shadow-indigo-500/30"
+                        >
+                          {isGalleryExpanded ? "Show Less" : "Show More"}
+                          {isGalleryExpanded ? <FaCaretUp /> : <FaCaretDown />}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               </div>
