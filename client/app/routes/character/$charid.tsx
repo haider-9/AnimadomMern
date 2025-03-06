@@ -142,7 +142,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
 
   return (
     <>
-      <title>{`Animadom|${characterData.name.full} `}</title>
+      <title>{`Animadom | ${characterData.name.full} `}</title>
 
       <AnimatePresence>
         <motion.div

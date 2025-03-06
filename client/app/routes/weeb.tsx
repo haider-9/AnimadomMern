@@ -60,7 +60,7 @@ const AuthForm: React.FC = () => {
         return;
       }
       toast.success("Signup successful!");
-      navigate("/profile");
+      navigate(`/user/${response.name}`);
     } catch (error) {
       console.log("error", error);
     }
@@ -77,7 +77,8 @@ const AuthForm: React.FC = () => {
       if (response && response.password === loginData.password) {
         // or whatever success indicator your backend sends
         toast.success("Login successful!");
-        navigate("/profile");
+        navigate(`/user/${response.name}`);
+
       } else {
         toast.error(response.message || "Invalid credentials");
       }
@@ -86,7 +87,6 @@ const AuthForm: React.FC = () => {
       console.error("Error:", error);
     }
   };
-
   return (
     <>
       <title>Animadom | Getstarted</title>
@@ -190,7 +190,7 @@ const AuthForm: React.FC = () => {
                             />
                           </div>
                         </div>
-                       
+
                         <div>
                           <label
                             htmlFor="password"

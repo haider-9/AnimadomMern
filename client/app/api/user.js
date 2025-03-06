@@ -38,3 +38,4 @@ export const login = async (data) => {
         throw error;
     }
 };
+
