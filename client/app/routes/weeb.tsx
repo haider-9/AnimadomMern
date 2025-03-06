@@ -34,9 +34,12 @@ const AuthForm: React.FC = () => {
     }
   };
 
+  // First password input (connected but floating)
+
   const handlogindata = (e: React.ChangeEvent<HTMLInputElement>) => {
     setloginData((prevData) => ({
       ...prevData,
+
       [e.target.name]: e.target.value,
     }));
   };
@@ -52,6 +55,12 @@ const AuthForm: React.FC = () => {
     try {
       const response = await signup(signupData);
       console.log("signup response", response);
+      if (!response) {
+        toast.error("Signup failed. Please try again.");
+        return;
+      }
+      toast.success("Signup successful!");
+      navigate("/profile");
     } catch (error) {
       console.log("error", error);
     }
@@ -61,12 +70,16 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     try {
       const response = await login(loginData);
+      console.log(loginData.password);
       console.log("Login Response:", response);
-      if (response && response.password==loginData.password) {
+
+      // Check for successful login response
+      if (response && response.password === loginData.password) {
+        // or whatever success indicator your backend sends
         toast.success("Login successful!");
         navigate("/profile");
       } else {
-        toast.error("Invalid credentials");
+        toast.error(response.message || "Invalid credentials");
       }
     } catch (error) {
       toast.error("Login failed. Please try again.");
@@ -177,17 +190,15 @@ const AuthForm: React.FC = () => {
                             />
                           </div>
                         </div>
+                       
                         <div>
+                          <label
+                            htmlFor="password"
+                            className="block text-sm font-medium"
+                          >
+                            Password
+                          </label>
                           <div className="flex items-center justify-between">
-                            <input
-                              type="password"
-                              id="password"
-                              name="password"
-                              value={loginData.password}
-                              onChange={handlogindata}
-                              className=""
-                              placeholder="Password"
-                            />
                             <a
                               href="#"
                               className="text-sm font-medium text-violet-600 hover:text-violet-500"
@@ -199,8 +210,11 @@ const AuthForm: React.FC = () => {
                             <input
                               type="password"
                               id="password"
+                              name="password"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="••••••••"
+                              value={loginData.password}
+                              onChange={handlogindata}
                             />
                           </div>
                         </div>
@@ -288,6 +302,7 @@ const AuthForm: React.FC = () => {
                             <input
                               type="text"
                               id="name"
+                              name="name"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="John Doe"
                               value={signupData.name}
@@ -306,6 +321,7 @@ const AuthForm: React.FC = () => {
                             <input
                               type="email"
                               id="signup-email"
+                              name="email"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="your.email@example.com"
                               value={signupData.email}
@@ -324,6 +340,7 @@ const AuthForm: React.FC = () => {
                             <input
                               type="password"
                               id="signup-password"
+                              name="password"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="••••••••"
                               value={signupData.password}
@@ -342,6 +359,7 @@ const AuthForm: React.FC = () => {
                             <input
                               type="password"
                               id="confirm-password"
+                              name="confirmPassword"
                               className="block w-full border-0 px-4 py-3 focus:outline-none focus:ring-0"
                               placeholder="••••••••"
                               value={signupData.confirmPassword}

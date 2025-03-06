@@ -40,19 +40,31 @@ export const deleteUser = async (req, res) => {
 
     }
 }
-  export const getUser = async (req, res) => {
-      try {
-          const { email } = req.params;
-          const user = await SignUp.findOne({ email: email });
-          if (!user) {
-              return res.status(404).json({ message: "User not found" });
-          }
-          res.status(200).json(user);
-      } catch (error) {
-          console.error(error);
-          res.status(500).json({ message: "Server error" });
-      }
-  }
+
+export const getUser = async (req, res) => {
+    try {
+        // Get credentials from request body instead of params
+        const { email, password } = req.body;
+
+        const user = await SignUp.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.password !== password) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+
+
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -62,6 +74,16 @@ export const updateUser = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
         res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+export const getallusers=async(req,res)=>{
+    try {
+        const users=await SignUp.find();
+        res.status(200).json(users);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error" });
