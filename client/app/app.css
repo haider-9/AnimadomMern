@@ -91,19 +91,33 @@ body {
     @apply border-border outline-ring/50;
     scroll-behavior: smooth
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
+
 @layer utilities {
   .container {
     @apply max-w-[1480px] w-full px-4 mx-auto sm:px-6 lg:px-8;
   }
 }
+
 @keyframes float {
-  0% { transform: translateY(0px); opacity: 0; }
-  50% { transform: translateY(-20px); opacity: 1; }
-  100% { transform: translateY(-40px); opacity: 0; }
+  0% {
+    transform: translateY(0px);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
 }
 
 .animate-float {
