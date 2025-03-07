@@ -16,7 +16,18 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-
+    toWatch: [{
+        type: String, // Anime ID
+        default: []
+    }],
+    watching: [{
+        type: String, // Anime ID
+        default: []
+    }],
+    watched: [{
+        type: String, // Anime ID
+        default: []
+    }]
 }, {
     timestamps: true
 });
