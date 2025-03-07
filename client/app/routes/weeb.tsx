@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
-// Define types for our form state
+
 type FormState = "signup" | "signin";
 interface FormEvent {
   target: {
@@ -27,6 +27,7 @@ const AuthForm: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
+
   const handleSwitch = (newState: FormState) => {
     if (newState !== formState) {
       setIsReversed(!isReversed);
@@ -34,15 +35,13 @@ const AuthForm: React.FC = () => {
     }
   };
 
-  // First password input (connected but floating)
-
   const handlogindata = (e: React.ChangeEvent<HTMLInputElement>) => {
     setloginData((prevData) => ({
       ...prevData,
-
       [e.target.name]: e.target.value,
     }));
   };
+
   const handleSignupdata = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSignupData((prevData) => ({
       ...prevData,
@@ -51,43 +50,55 @@ const AuthForm: React.FC = () => {
   };
 
   const handlesignup = async (e: React.FormEvent) => {
-    e.preventDefault(); // Add this
+    e.preventDefault();
+    
+    // Validate passwords match
+    if (signupData.password !== signupData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
     try {
       const response = await signup(signupData);
-      console.log("signup response", response);
-      if (!response) {
-        toast.error("Signup failed. Please try again.");
+      
+      if (!response || response.error) {
+        toast.error(response?.error || "Signup failed. Please try again.");
         return;
       }
+
       toast.success("Signup successful!");
-      const { user } = response;
-      navigate(`/user/${user.name}`);
-    } catch (error) {
-      console.log("error", error);
+      navigate(`/user/${response.user.name}`);
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during signup");
+      console.error("Signup error:", error);
     }
   };
 
   const handlelogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     try {
       const response = await login(loginData);
-      console.log(loginData.password);
-      console.log("Login Response:", response);
 
-      // Check for successful login response
-      if (response && response.password === loginData.password) {
-        // or whatever success indicator your backend sends
-        toast.success("Login successful!");
-        navigate(`/user/${response.name}`);
-
-      } else {
-        toast.error(response.message || "Invalid credentials");
+      if (!response || response.error) {
+        toast.error(response?.error || "Invalid credentials");
+        return;
       }
-    } catch (error) {
-      toast.error("Login failed. Please try again.");
-      console.error("Error:", error);
+
+      // Store token in localStorage
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+      }
+
+      toast.success("Login successful!");
+      navigate(`/user/${response.user.name}`);
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please try again.");
+      console.error("Login error:", error);
     }
   };
+
+  // Rest of the JSX remains the same
   return (
     <>
       <title>Animadom | Getstarted</title>
@@ -444,4 +455,5 @@ const AuthForm: React.FC = () => {
     </>
   );
 };
+
 export default AuthForm;
