@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { dbconn } from './config/db.js';
-import userRoutes from './routes/signup.route.js';
+import userRoutes from './routes/user.route.js';
 import cors from 'cors';
 import { ExpressAuth } from "@auth/express"
 
@@ -19,5 +19,5 @@ app.use("/api", userRoutes)
 
 app.listen(port, async () => {
     await dbconn()
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });

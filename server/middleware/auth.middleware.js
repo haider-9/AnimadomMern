@@ -8,10 +8,10 @@ export const verifyToken = (req, res, next) => {
     if (!token) return res.status(401).json({ message: "Access denied" });
 
     try {
-        const verified = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
-        req.userVerified = verified;
+        const decoded = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
+        req.userId = decoded.id ?? null;
         next();
     } catch (error) {
-        res.status(400).json({ message: "Invalid token" });
+        res.status(400).json({ message: "Authentication required" });
     }
 };

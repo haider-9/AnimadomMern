@@ -1,97 +1,128 @@
+import dotenv from 'dotenv';
 import User from '../models/user.model.js';
 import jwt from "jsonwebtoken";
+import ApiResponse from '../lib/ApiResponse.js';
+import ApiError from "../lib/ApiError.js"
+
+dotenv.config();
 
 export const addUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         if (!name || !email || !password) {
-            return res.status(400).json({ message: 'All fields are required' });
+            throw new ApiError(400, 'All fields are required');
         }
+        
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Email is already in use' });
+            throw new ApiError(400, 'Email is already in use');
         }
-        const newUser = new User({
-            name,
-            email,
-            password,
-        });
+
+        const newUser = new User({ name, email, password });
         await newUser.save();
+        
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.cookie('token', token, { httpOnly: true });
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
-
+        
+        return res.status(201).json(
+            new ApiResponse(201, 'User registered successfully', { user: newUser, token })
+        );
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        if (error instanceof ApiError) {
+            return res.status(error.statusCode).json(error);
+        }
+        return res.status(500).json(new ApiError(500, 'Server error'));
     }
 }
 
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-
         const user = await User.findByIdAndDelete(id);
+        
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            throw new ApiError(404, 'User not found');
         }
-        res.status(200).json({ message: "User deleted successfully", token });
+        
+        return res.status(200).json(
+            new ApiResponse(200, 'User deleted successfully')
+        );
+    } catch (error) {
+        if (error instanceof ApiError) {
+            return res.status(error.statusCode).json(error);
+        }
+        return res.status(500).json(new ApiError(500, 'Server error'));
     }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+}
 
+export const logout = async (_, res) => {
+    try {
+        res.clearCookie('token');
+        return res.status(200).json(
+            new ApiResponse(200, 'Logged out successfully')
+        );
+    } catch (error) {
+        return res.status(500).json(new ApiError(500, 'Server error'));
     }
 }
 
 export const getUser = async (req, res) => {
     try {
-        // Get credentials from request body instead of params
         const { email, password } = req.body;
-
         const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
+        if (!user || user.password !== password) {
+            throw new ApiError(404, 'Invalid username or password');
         }
 
-        if (user.password !== password) {
-            return res.status(401).json({ message: "Invalid password" });
-        }
-
-        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        user.password = undefined;
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.cookie('token', token, { httpOnly: true });
 
-        res.status(200).json({ message: "User Verified", user, token });
+        return res.status(200).json(
+            new ApiResponse(200, 'User Verified', { user, token })
+        );
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        if (error instanceof ApiError) {
+            return res.status(error.statusCode).json(error);
+        }
+        return res.status(500).json(new ApiError(500, 'Server error'));
     }
 }
-
-
 
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email, password } = req.body;
-        const user = await User.findByIdAndUpdate(id, { name, email, password }, { new: true });
+        
+        const user = await User.findByIdAndUpdate(
+            id, 
+            { name, email, password }, 
+            { new: true }
+        );
+        
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            throw new ApiError(404, 'User not found');
         }
-        res.status(200).json(user);
+        
+        return res.status(200).json(
+            new ApiResponse(200, 'User updated successfully', { user })
+        );
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        if (error instanceof ApiError) {
+            return res.status(error.statusCode).json(error);
+        }
+        return res.status(500).json(new ApiError(500, 'Server error'));
     }
 }
 
 export const getallusers = async (req, res) => {
     try {
         const users = await User.find();
-        res.status(200).json(users);
+        return res.status(200).json(
+            new ApiResponse(200, 'Users retrieved successfully', { users })
+        );
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        return res.status(500).json(new ApiError(500, 'Server error'));
     }
 }
