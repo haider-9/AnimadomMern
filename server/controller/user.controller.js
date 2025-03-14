@@ -12,7 +12,7 @@ export const addUser = async (req, res) => {
         if (!name || !email || !password) {
             throw new ApiError(400, 'All fields are required');
         }
-        
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             throw new ApiError(400, 'Email is already in use');
@@ -20,10 +20,10 @@ export const addUser = async (req, res) => {
 
         const newUser = new User({ name, email, password });
         await newUser.save();
-        
+
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.cookie('token', token, { httpOnly: true });
-        
+
         return res.status(201).json(
             new ApiResponse(201, 'User registered successfully', { user: newUser, token })
         );
@@ -32,6 +32,7 @@ export const addUser = async (req, res) => {
             return res.status(error.statusCode).json(error);
         }
         return res.status(500).json(new ApiError(500, 'Server error'));
+        
     }
 }
 
@@ -39,11 +40,11 @@ export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findByIdAndDelete(id);
-        
+
         if (!user) {
             throw new ApiError(404, 'User not found');
         }
-        
+
         return res.status(200).json(
             new ApiResponse(200, 'User deleted successfully')
         );
@@ -94,17 +95,17 @@ export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email, password } = req.body;
-        
+
         const user = await User.findByIdAndUpdate(
-            id, 
-            { name, email, password }, 
+            id,
+            { name, email, password },
             { new: true }
         );
-        
+
         if (!user) {
             throw new ApiError(404, 'User not found');
         }
-        
+
         return res.status(200).json(
             new ApiResponse(200, 'User updated successfully', { user })
         );

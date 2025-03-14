@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
-import { resolve } from "path";
 
 type FormState = "signup" | "signin";
 interface FormEvent {

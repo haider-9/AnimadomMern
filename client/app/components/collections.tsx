@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { motion, useAnimation } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import Marquee from "react-fast-marquee";
 import AnimeCard from "./animecard";
 import { Button } from "./ui/button";
 
@@ -14,10 +14,8 @@ interface Anime {
 export default function InfiniteAnimeScroll() {
   const [animeList, setAnimeList] = useState<Anime[]>([]);
   const [isPaused, setIsPaused] = useState(false);
-  const controls = useAnimation();
-  const progressRef = useRef(0);
-  const startTimeRef = useRef<number>(Date.now());
-  const scrollDirection = useRef<"left" | "right">("left");
+  const [direction, setDirection] = useState<"left" | "right">("left");
+  const [speed, setSpeed] = useState(40);
 
   useEffect(() => {
     const fetchAnime = async () => {
@@ -39,7 +37,10 @@ export default function InfiniteAnimeScroll() {
                 }
               }
             `,
-            variables: { page: Math.floor(Math.random() * 10) + 1, perPage: 50 },
+            variables: {
+              page: Math.floor(Math.random() * 10) + 1,
+              perPage: 50,
+            },
           }),
         });
         const { data } = await response.json();
@@ -60,98 +61,69 @@ export default function InfiniteAnimeScroll() {
     fetchAnime();
   }, []);
 
-  useEffect(() => {
-    if (!isPaused) {
-      startAnimation();
-    } else {
-      controls.stop();
-    }
-  }, [isPaused, controls]);
-
-  const startAnimation = () => {
-    const direction = scrollDirection.current;
-    controls.start({
-      x: direction === "left" ? "-100%" : "0%",
-      transition: { 
-        duration: 40, 
-        repeat: Infinity, 
-        ease: "linear",
-        from: direction === "left" ? "0%" : "-100%"
-      },
-    });
-    startTimeRef.current = Date.now();
-  };
-
-  const handlePause = () => {
-    setIsPaused(true);
-    controls.stop();
-    const elapsedTime = Date.now() - startTimeRef.current;
-    const duration = 40 * 1000;
-    progressRef.current = (elapsedTime % duration) / duration;
-  };
-
-  const handleResume = () => {
-    setIsPaused(false);
-    startAnimation();
-  };
-
   const handleScrollLeft = () => {
-    handlePause();
-    scrollDirection.current = "right";
-    handleResume();
+    setDirection("right");
   };
 
   const handleScrollRight = () => {
-    handlePause();
-    scrollDirection.current = "left";
-    handleResume();
+    setDirection("left");
   };
 
   const handleMouseEnter = () => {
-    handlePause();
+    setIsPaused(true);
   };
 
   const handleMouseLeave = () => {
-    handleResume();
+    setIsPaused(false);
   };
-
-  const duplicatedAnimeList = [...animeList, ...animeList];
 
   return (
     <div className="relative w-full py-8 overflow-hidden">
       <div className="flex justify-between items-center px-6 pb-4">
         <h2 className="text-2xl font-bold">Random Anime</h2>
         <div className="flex gap-2">
-          <Button 
-            onClick={handleScrollLeft} 
-            variant="outline" 
-            className="text-xl"
+          <Button
+            onClick={handleScrollLeft}
+            variant="outline"
+            className="rounded-full"
             aria-label="Scroll left"
           >
             &#60;
           </Button>
-          <Button 
-            onClick={handleScrollRight} 
-            variant="outline" 
-            className="text-xl"
+          <Button
+            onClick={handleScrollRight}
+            variant="outline"
+            className="rounded-full"
             aria-label="Scroll right"
           >
             &#62;
           </Button>
         </div>
       </div>
-      <motion.div
-        className="flex gap-4"
-        animate={controls}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {duplicatedAnimeList.map((anime, index) => (
-          <motion.div key={`${anime.id}-${index}`} className="flex-shrink-0 overflow-hidden rounded-xl">
-            <AnimeCard imageUrl={anime.imageUrl} title={anime.title} hreflink={anime.hreflink} score={anime.score} />
-          </motion.div>
-        ))}
-      </motion.div>
+
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <Marquee
+          speed={speed}
+          direction={direction}
+          pauseOnHover={false}
+          play={!isPaused}
+          gradient={false}
+        >
+          {animeList.map((anime, index) => (
+            <div
+              key={`${anime.id}-${index}`}
+              className="flex-shrink-0 overflow-hidden rounded-xl mx-2 "
+            >
+              <AnimeCard
+                imageUrl={anime.imageUrl}
+                title={anime.title}
+                hreflink={`anime/${anime.id}`}
+                score={anime.score}
+              />
+            </div>
+          ))}
+        </Marquee>
+      </div>
     </div>
   );
 }
