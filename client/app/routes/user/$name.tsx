@@ -26,6 +26,9 @@ const stats = [
   { label: "Days Watched", value: "31.5" },
   { label: "Mean Score", value: "8.2" },
 ];
+const userfiles=[
+  {}
+]
 
 export default function Profile() {
   const params = useParams();
@@ -44,7 +47,7 @@ export default function Profile() {
           style={{ filter: "brightness(0.6)" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900" />
-        
+
         <div className="container mx-auto px-6 h-full flex items-end pb-8 relative z-10">
           <div className="flex items-end gap-6">
             <motion.img
@@ -55,14 +58,14 @@ export default function Profile() {
               className="w-32 h-32 rounded-full border-4 border-purple-500 shadow-xl"
             />
             <div className="mb-2">
-              <motion.h1 
+              <motion.h1
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="text-4xl font-bold"
               >
                 {USER_NAME?.toUpperCase()}
               </motion.h1>
-              <motion.p 
+              <motion.p
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
@@ -109,9 +112,13 @@ export default function Profile() {
                 <span>{tab.icon}</span>
                 <span>{tab.label}</span>
                 <span className="text-sm">
-                  ({activeTab === "watching" ? watchingAnime.length : 
-                    activeTab === "towatch" ? toWatchAnime.length : 
-                    watchedAnime.length})
+                  (
+                  {activeTab === "watching"
+                    ? watchingAnime.length
+                    : activeTab === "towatch"
+                    ? toWatchAnime.length
+                    : watchedAnime.length}
+                  )
                 </span>
                 {activeTab === tab.id && (
                   <motion.div

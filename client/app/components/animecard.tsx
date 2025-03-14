@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { LuBugPlay, LuPlay, LuPlus, LuStar } from "react-icons/lu";
+import { LuPlay, LuPlus, LuStar } from "react-icons/lu";
 
 interface AnimeCardProps {
   imageUrl: string;
@@ -22,7 +22,10 @@ export default function AnimeCard({
   score = 0,
 }: AnimeCardProps) {
   return (
-    <Link to={hreflink} className="group relative w-[280px] h-[400px] rounded-lg overflow-hidden shadow-lg md:w-[250px] md:h-[360px] sm:w-[220px] sm:h-[320px] cursor-pointer">
+    <Link
+      to={hreflink}
+      className="group relative w-[280px] h-[400px] rounded-lg overflow-hidden shadow-lg md:w-[250px] md:h-[360px] sm:w-[220px] sm:h-[320px] cursor-pointer"
+    >
       <img
         src={imageUrl || "https://dummyimage.com/500x500"}
         alt={title}
@@ -30,7 +33,7 @@ export default function AnimeCard({
       />
 
       <div className="absolute top-2 right-2 bg-black/70 px-2 py-1 rounded-md text-sm text-yellow-500 inline-flex items-center gap-1">
-        <LuStar/> {score}
+        <LuStar /> {score}
       </div>
 
       <div className="px-3 py-5 absolute opacity-0 group-hover:opacity-100 inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end translate-y-6 transition-all duration-500 ease-in-out group-hover:translate-y-0 ">
