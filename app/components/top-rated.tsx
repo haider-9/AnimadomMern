@@ -56,13 +56,15 @@ export default function TrendingAnime() {
         </div>
         <div className="flex flex-wrap gap-4 justify-center mx-auto">
           {trendingAnime.map((anime) => (
-            <AnimeCard
-              key={anime.mal_id}
-              title={anime.title}
-              imageUrl={anime.images.jpg.large_image_url}
-              hreflink={`/anime/${anime.mal_id}`}
-              score={anime.score}
-            />
+            <div className="flex-shrink-0" key={anime.mal_id}>
+              <AnimeCard
+                key={anime.mal_id}
+                title={anime.title}
+                imageUrl={anime.images.jpg.large_image_url}
+                hreflink={`/anime/${anime.mal_id}`}
+                score={anime.score}
+              />
+            </div>
           ))}
         </div>
       </section>

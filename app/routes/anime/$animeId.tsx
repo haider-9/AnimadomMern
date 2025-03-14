@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegStar, FaPlay, FaFilm } from "react-icons/fa";
-import { Link } from "react-router"; 
+import { Link } from "react-router";
 import AnimeCard from "~/components/animecard";
 import type { Route } from "./+types/$animeId";
 import CharacterCard from "~/components/charactercard";
@@ -160,7 +160,6 @@ export default function AnimeDescription({
           <meta property="og:image" content={animeDetails.posterImage} />
           <meta property="og:url" content={`https://anima.dom/${animeId}`} />
           <meta property="og:type" content="website" />
-          
         </head>
 
         <div className="relative h-[50vh] md:h-[70vh] overflow-hidden">
@@ -226,21 +225,6 @@ export default function AnimeDescription({
                     </div>
                   </div>
                 </div>
-                <Link to={`/episodes/${animeId}`}>
-                  <div className="bg-zinc-800/40 backdrop-blur-sm rounded-2xl p-6 hover:bg-zinc-800/60 transition-all duration-300">
-                    <div className="flex flex-col items-center gap-3">
-                      <FaPlay className="text-blue-500 text-2xl" />
-                      <div className="text-center">
-                        <span className="text-xl font-medium">
-                          {episodes || "TBA"}
-                        </span>
-                        <span className="text-zinc-400 text-sm block">
-                          Episodes
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
 
                 <div className="bg-zinc-800/40 backdrop-blur-sm rounded-2xl p-6 hover:bg-zinc-800/60 transition-all duration-300">
                   <div className="flex flex-col items-center gap-3">
@@ -357,7 +341,7 @@ export default function AnimeDescription({
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-3xl font-bold">Similar Anime</h2>
                 </div>
-                <div className="flex flex-wrap w-full gap-4 mx-auto">
+                <div className="flex flex-wrap w-full justify-center gap-4 mx-auto">
                   {recommendations?.slice(0, 15)?.map(({ entry }) => (
                     <AnimeCard
                       key={entry.mal_id}

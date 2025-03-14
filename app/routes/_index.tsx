@@ -21,7 +21,7 @@ export function meta({}: Route.MetaArgs) {
     { name: "viewport", content: "width=device-width, initial-scale=1.0" },
     { name: "robots", content: "index, follow" },
     { name: "googlebot", content: "index, follow" },
-    { link: "icon", href: "/favicon.ico" },
+    { link: "icon", href: "/favicon.png" },
   ];
 }
 

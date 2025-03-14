@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router";
+
 import {
   FaHeart,
   FaMicrophone,
@@ -116,6 +117,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
 
         const { data } = await response.json();
         if (!data?.Character) {
+          setIsLoading(false);
           return;
         }
         setCharacterData(data.Character);
@@ -160,9 +162,8 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
       fetchGallery();
     }
   }, [params.charid]);
-  if (!characterData) return null;
   if (isLoading) return <Loading />;
-
+  if (!characterData) return <Loading />;
   return (
     <>
       <head>

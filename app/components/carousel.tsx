@@ -4,7 +4,6 @@ import { topAnime } from "~/constants";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "./ui/button";
-import { LucideMoveRight, LucideToggleRight } from "lucide-react";
 
 export default function Carousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -95,7 +94,7 @@ export default function Carousel() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 right-8 flex gap-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute bottom-8 right-8 flex gap-2 z-50 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 opacity-100">
         <button
           onClick={onPrevClick}
           className="flex items-center justify-center size-8 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-300 hover:scale-110 cursor-pointer"

@@ -89,7 +89,7 @@ const Collections: React.FC = () => {
   return (
     <div className="my-8">
       <h2 className="text-2xl font-bold mb-4 text-white">
-        Random Anime
+        For You
       </h2>
       <div
         className="w-full overflow-hidden"

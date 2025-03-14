@@ -17,4 +17,6 @@ export default [
   route("top-rated", "./routes/top-rated.tsx"),
   route("trending", "./routes/airing.tsx"),
   route("search/:query", "./routes/search/$query.tsx"),
+  route("top_characters", "./routes/characters.tsx"),
+  route("shush", "./routes/secret.tsx")
 ] satisfies RouteConfig;
