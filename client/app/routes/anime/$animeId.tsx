@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegStar, FaPlay, FaFilm } from "react-icons/fa";
-import { Link } from "react-router"; // Using useLoaderData
+import { Link } from "react-router"; 
 import AnimeCard from "~/components/animecard";
 import type { Route } from "./+types/$animeId";
 import CharacterCard from "~/components/charactercard";
@@ -151,9 +151,18 @@ export default function AnimeDescription({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <title>{title_english}</title>
+        <head>
+          <title>{title_english}</title>
+          <meta name="keywords" content={genres.join(", ")} />
+          <meta name="author" content="AnimaDom" />
+          <meta property="og:title" content={title_english || title} />
+          <meta property="og:description" content={synopsis} />
+          <meta property="og:image" content={animeDetails.posterImage} />
+          <meta property="og:url" content={`https://anima.dom/${animeId}`} />
+          <meta property="og:type" content="website" />
+          
+        </head>
 
-        {/* Hero Section */}
         <div className="relative h-[50vh] md:h-[70vh] overflow-hidden">
           <motion.img
             initial={{ scale: 1.1 }}

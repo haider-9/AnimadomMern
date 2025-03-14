@@ -46,7 +46,7 @@ export default function AnimeCard({
             className="bg-purple-600 hover:bg-purple-700 text-white font-semibold grow"
           >
             <Link to={hreflink}>
-              <LuPlay /> Watch Now
+              <LuPlay /> Learn More
             </Link>
           </Button>
           <DropdownMenu>

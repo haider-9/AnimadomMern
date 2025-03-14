@@ -19,7 +19,6 @@ export default function CollectionCard({
 }: CollectionCardProps) {
   return (
     <div className="relative border w-[320px] h-[420px] cursor-pointer overflow-hidden rounded-3xl shadow-xl bg-black/30 group">
-      {/* Blurred Background */}
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={backgroundImage}

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
+import { resolve } from "path";
 
 type FormState = "signup" | "signin";
 interface FormEvent {
@@ -51,7 +52,7 @@ const AuthForm: React.FC = () => {
 
   const handlesignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate passwords match
     if (signupData.password !== signupData.confirmPassword) {
       toast.error("Passwords do not match");
@@ -60,7 +61,7 @@ const AuthForm: React.FC = () => {
 
     try {
       const response = await signup(signupData);
-      
+
       if (!response || response.error) {
         toast.error(response?.error || "Signup failed. Please try again.");
         return;
@@ -76,7 +77,7 @@ const AuthForm: React.FC = () => {
 
   const handlelogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const response = await login(loginData);
 
@@ -87,7 +88,7 @@ const AuthForm: React.FC = () => {
 
       // Store token in localStorage
       if (response.token) {
-        localStorage.setItem('token', response.token);
+        localStorage.setItem("token", response.token);
       }
 
       toast.success("Login successful!");
