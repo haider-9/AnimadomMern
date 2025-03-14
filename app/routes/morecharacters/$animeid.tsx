@@ -62,7 +62,7 @@ export default function AnimeCharacters() {
   return (
     <>
     <title>{`All Character ` }</title>
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen">
       <h1 className="mb-8 text-3xl font-bold text-white">Characters</h1>
       <div className="flex flex-wrap justify-center gap-4">
         {paginatedCharacters.map((char) => (

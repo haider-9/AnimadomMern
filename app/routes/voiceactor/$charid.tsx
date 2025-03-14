@@ -13,14 +13,12 @@ export default function VoiceActorPage() {
   useEffect(() => {
     const fetchVoiceActors = async () => {
       try {
-        // First, fetch the character info to get the name
         const characterResponse = await fetch(
           `https://api.jikan.moe/v4/characters/${charid}`
         );
         const characterData = await characterResponse.json();
         setCharacterName(characterData.data.name);
 
-        // Then fetch the voice actors
         const response = await fetch(
           `https://api.jikan.moe/v4/characters/${charid}/voices`
         );
@@ -46,7 +44,7 @@ export default function VoiceActorPage() {
         <h1 className="text-3xl font-bold mb-6">
           Voice Actors for {characterName}
         </h1>
-        <div className="flex flex-wrap gap-6">
+        <div className="flex flex-wrap gap-4">
           {voiceActors.map((actor: any) => (
             <CharacterCard
               key={actor.person.mal_id}

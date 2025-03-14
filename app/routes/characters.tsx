@@ -73,9 +73,7 @@ export default function Characters() {
       />
 
       <section className="py-8">
-        <h2 className="text-2xl font-bold mb-6 px-4 ">
-          Top Characters
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 px-4 ">Top Characters</h2>
 
         {/* Character Cards Grid */}
         <div className="flex flex-wrap justify-center gap-4 px-4">

@@ -63,7 +63,7 @@ export default function Header() {
             </li>
             <li>
               <Link
-                to="/top_charcaters"
+                to="/top_characters"
                 className="hover:text-white transition-colors duration-200 
                 "
               >
@@ -159,7 +159,6 @@ export default function Header() {
           </DropdownMenu>
         </div>
 
-        {/* Mobile Menu Button - Only show on small screens */}
         <Button
           variant="ghost"
           size="icon"
@@ -259,13 +258,11 @@ export default function Header() {
                     </li>
                     <li>
                       <Link
-                        to="/top_charcaters"
+                        to="/top_characters"
                         className="hover:text-white transition-colors duration-200 block py-2"
                         onClick={() => setIsSidebarOpen(false)}
                       >
-                        <ruby className="hidden sm:block">
-                          <rt>Top</rt>Characters
-                        </ruby>
+                        Top Characters
                       </Link>
                     </li>
                     <li>

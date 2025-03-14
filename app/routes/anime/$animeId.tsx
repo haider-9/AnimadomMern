@@ -323,7 +323,7 @@ export default function AnimeDescription({
                     </Button>
                   </Link>
                 </div>
-                <div className="flex flex-wrap  w-[95%] gap-4 mx-auto">
+                <div className="flex flex-wrap justify-center items-center gap-4 mx-auto">
                   {characters
                     ?.filter((char) => char.role === "Main")
                     ?.map((char: any) => (

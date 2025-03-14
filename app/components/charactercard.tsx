@@ -17,7 +17,7 @@ export default function CharacterCard({
   hreflink,
 }: CharacterCardProps) {
   return (
-    <div className="group relative sm:w-[250px] w-[185px] h-[250px] sm:h-[350px] rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl">
+    <div className="group relative sm:w-[250px] w-[170px] h-[250px] sm:h-[350px] rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl">
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-black/40 z-10" />
 
       <img

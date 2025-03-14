@@ -1,9 +1,8 @@
+import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { useEffect, useState } from "react";
 import AnimeCard from "~/components/animecard";
 import Loader from "~/components/loader";
 import { Button } from "~/components/ui/button";
-
 interface AnimeData {
   mal_id: number;
   title: string;
@@ -13,34 +12,10 @@ interface AnimeData {
     };
   };
   year: number;
+  genres: string[];
+  averageScore: number;
+  popularity: number;
 }
-
-const ANILIST_GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-
-const ANIME_BY_GENRE_QUERY = `
-  query ($term: String, $page: Int, $perPage: Int) {
-    Page(page: $page, perPage: $perPage) {
-      pageInfo {
-        total
-        currentPage
-        lastPage
-        hasNextPage
-      }
-      media(genre: $term, type: ANIME, sort: POPULARITY_DESC) {
-        idMal
-        title {
-          english
-        }
-        coverImage {
-          large
-        }
-        startDate {
-          year
-        }
-      }
-    }
-  }
-`;
 
 export default function GenrePage() {
   const { genrename } = useParams();
@@ -51,7 +26,36 @@ export default function GenrePage() {
   const itemsPerPage = 20;
 
   useEffect(() => {
+    const ANILIST_GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
     const fetchAnime = async () => {
+      const ANIME_BY_GENRE_QUERY = `
+      query ($genre: String, $page: Int, $perPage: Int) {
+        Page(page: $page, perPage: $perPage) {
+          pageInfo {
+            total
+            currentPage
+            lastPage
+            hasNextPage
+          }
+          media(search: $genre, type: ANIME, sort: SCORE_DESC) {
+            idMal
+            title {
+              english
+              romaji
+            }
+            coverImage {
+              large
+            }
+            startDate {
+              year
+            }
+            genres
+            averageScore
+            popularity
+          }
+        }
+      }
+    `;
       try {
         const response = await fetch(ANILIST_GRAPHQL_ENDPOINT, {
           method: "POST",
@@ -61,7 +65,7 @@ export default function GenrePage() {
           body: JSON.stringify({
             query: ANIME_BY_GENRE_QUERY,
             variables: {
-              term: genrename,
+              genre: genrename,
               page: currentPage,
               perPage: itemsPerPage,
             },
@@ -69,11 +73,14 @@ export default function GenrePage() {
         });
         const { data } = await response.json();
 
-        const formattedAnime = data.Page.media.map((anime) => ({
+        const formattedAnime = data.Page.media.map((anime: any) => ({
           mal_id: anime.idMal,
-          title: anime.title.english,
+          title: anime.title.english || anime.title.romaji,
           images: { jpg: { large_image_url: anime.coverImage.large } },
           year: anime.startDate.year,
+          genres: anime.genres,
+          averageScore: anime.averageScore,
+          popularity: anime.popularity,
         }));
 
         setAnimeList(formattedAnime);
@@ -87,7 +94,6 @@ export default function GenrePage() {
 
     fetchAnime();
   }, [genrename, currentPage]);
-
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     window.scrollTo(0, 0);
