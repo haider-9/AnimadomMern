@@ -1,4 +1,4 @@
-import AnimeCard from "~/components/AnimeCard";
+import AnimeCard from "./animecard";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Loading from "../components/loader";

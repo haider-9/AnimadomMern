@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import AnimeCard from "~/components/animecard";
+import AnimeCard from "../components/animecard";
 import { Button } from "~/components/ui/button";
 import Loading from "~/components/loader";
 
