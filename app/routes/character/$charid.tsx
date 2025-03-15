@@ -35,7 +35,7 @@ interface CharacterData {
   favourites: number;
   media: {
     nodes: Array<{
-      id: number;
+      idMal: number;
       title: {
         english: string;
         romaji: string;
@@ -87,9 +87,9 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
             }
             age
             favourites
-            media(sort: POPULARITY_DESC, perPage: 12) {
+            media(sort: POPULARITY_DESC, perPage: 30) {
               nodes {
-                id
+                idMal
                 title {
                   english
                   romaji
@@ -383,8 +383,8 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {characterData.media.nodes.map((media) => (
                   <Link
-                    to={`/anime/${media.id}`}
-                    key={media.id}
+                    to={`/anime/${media.idMal}`}
+                    key={media.idMal}
                     className="block bg-zinc-700/30 rounded-xl overflow-hidden hover:bg-zinc-700/50 transition-all duration-300"
                   >
                     <div className="flex items-center gap-4 p-4">
