@@ -35,7 +35,7 @@ export default function Home() {
         <TrendingAnime />
         <Toprated />
         <Button asChild className="w-full">
-          <Link to="/topbyyear">Top Anime by Year</Link>
+          <Link to="/topbyyear">Top Anime by Year & Seasons</Link>
         </Button>{" "}
       </main>
     </>

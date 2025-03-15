@@ -103,6 +103,8 @@ export default function YearsTop() {
   if (error) return <div>{error}</div>
 
   return (
+    <>
+    <title>Animadom | Years & Seasons</title>
     <div className="min-h-screen mt-3">
       <div className="container mx-auto px-6">
         <h1 className="text-3xl font-bold mb-6 ">Top Anime by Year & Season</h1>
@@ -232,5 +234,6 @@ export default function YearsTop() {
         </div>
       </div>
     </div>
+    </>
   )
 }
