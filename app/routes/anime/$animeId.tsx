@@ -153,12 +153,24 @@ export default function AnimeDescription({
       >
         <head>
           <title>{title_english}</title>
-          <meta name="keywords" content={genres.join(", ")} />
+          <meta
+            name="keywords"
+            content={genres?.map((genre) => genre.name).join(", ")}
+          />
           <meta name="author" content="AnimaDom" />
           <meta property="og:title" content={title_english || title} />
-          <meta property="og:description" content={synopsis} />
-          <meta property="og:image" content={animeDetails.posterImage} />
-          <meta property="og:url" content={`https://anima.dom/${animeId}`} />
+          <meta
+            property="og:description"
+            content={synopsis || "No description available"}
+          />
+          <meta
+            property="og:image"
+            content={animeDetails.posterImage || "/poster404.jpg"}
+          />
+          <meta
+            property="og:url"
+            content={`https://animadom.vercel.app/anime/${animeId}`}
+          />
           <meta property="og:type" content="website" />
         </head>
 

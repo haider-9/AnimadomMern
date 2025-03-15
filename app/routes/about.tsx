@@ -18,7 +18,7 @@ export default function About() {
   return (
     <>
       <head>
-        <title>About Animadom</title>
+        <title>Animadom | About</title>
         <meta name="description" content="Learn about Animadom - a comprehensive anime discovery platform" />
       </head>
       <div className="py-12 max-w-6xl mx-auto space-y-10 px-4 sm:px-6">

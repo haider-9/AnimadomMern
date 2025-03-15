@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import AnimeCard from "~/components/animecard";
 import { cn } from "~/lib/utils";
-import Loading from '~/components/loader';
+import Loading from "~/components/loader";
+import { Button } from "~/components/ui/button";
 
 interface AnimeData {
   idMal: number;
@@ -90,7 +91,6 @@ export default function StudioPage() {
         setIsLoading(false);
       }
     };
-
     fetchStudioAnime();
   }, [currentPage, studioname]);
 
@@ -100,69 +100,85 @@ export default function StudioPage() {
   };
 
   if (isLoading) {
-    return (
-     <Loading />
-    );
+    return <Loading />;
   }
 
   return (
     <>
-    <title>{studioname} Anime</title>
-    <div className=" mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 capitalize">
-        Anime by {studioname}
-      </h1>
-      {animeList.length > 0 ? (
-        <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
-          {animeList.map((anime) => (
-            <AnimeCard
-              key={anime.idMal}
-              imageUrl={anime.coverImage.large}
-              title={anime.title.english || anime.title.romaji}
-              hreflink={`/anime/${anime.idMal}`}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center text-xl">
-          No anime found for this studio.
-        </div>
-      )}
+      <title>{`Animadom | ${studioname}`}</title>
+      <div className="mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8 capitalize">
+          Anime by {studioname}
+        </h1>
+        {animeList.length > 0 ? (
+          <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
+            {animeList.map((anime) => (
+              <AnimeCard
+                key={anime.idMal}
+                imageUrl={anime.coverImage.large}
+                title={anime.title.english || anime.title.romaji}
+                hreflink={`/anime/${anime.idMal}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-xl">
+            No anime found for this studio.
+          </div>
+        )}
 
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-8">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={cn(
-              "px-4 py-2 rounded-md",
-              currentPage === 1
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            )}
-          >
-            Previous
-          </button>
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
+              <Button
+                variant="outline"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
 
-          <span className="mx-4">
-            Page {currentPage} of {totalPages}
-          </span>
+              {[...Array(totalPages)].map((_, index) => {
+                if (
+                  index === 0 ||
+                  index === totalPages - 1 ||
+                  (index >= currentPage - 2 && index <= currentPage + 2)
+                ) {
+                  return (
+                    <Button
+                      key={index + 1}
+                      variant={
+                        currentPage === index + 1 ? "default" : "outline"
+                      }
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </Button>
+                  );
+                }
 
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={cn(
-              "px-4 py-2 rounded-md",
-              currentPage === totalPages
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            )}
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
+                if (index === currentPage - 3 || index === currentPage + 3) {
+                  return (
+                    <span key={index} className="text-white">
+                      ...
+                    </span>
+                  );
+                }
+
+                return null;
+              })}
+
+              <Button
+                variant="outline"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

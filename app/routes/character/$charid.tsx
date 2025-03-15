@@ -168,21 +168,21 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
     <>
       <head>
         <title>{`Animadom | ${characterData.name.full} `}</title>
-        <meta name="description" content={characterData.description} />
-        <meta name="keywords" content={characterData.name.full} />
+        <meta name="description" content={characterData.description || `Character profile for ${characterData.name.full}`} />
+        <meta name="keywords" content={`anime, character, ${characterData.name.full}, ${characterData.name.native || ''}`} />
 
         <meta
           property="og:title"
           content={`Animadom | ${characterData.name.full}`}
         />
+        <meta property="og:description" content={characterData.description || `Character profile for ${characterData.name.full}`} />
         <meta property="og:image" content={characterData.image.large} />
         <meta property="og:type" content="website" />
         <meta
           property="og:url"
-          content={`https://animadom.vercel.app/characters/${params.charid}`}
+          content={`https://animadom.vercel.app/character/${params.charid}`}
         />
       </head>
-
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
