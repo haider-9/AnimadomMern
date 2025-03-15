@@ -41,17 +41,17 @@ export default function CharacterCard({
           {name}
         </h3>
 
-        <div className="flex gap-2">
+        <div className="flex items-center justify-center gap-2">
           <Link to={hreflink} className="flex-1">
             <Button
               variant="default"
-              size="sm"
-              className="w-full bg-primary/90 hover:bg-primary transition-all duration-300"
+              size="icon"
+              className="w-full bg-primary/90 hover:bg-primary transition-all duration-300 sm:p-1 p-2"
             >
               View Details
             </Button>
           </Link>
-          <Button variant="secondary" size="sm" className="aspect-square">
+          <Button variant="secondary" size="sm" className="aspect-square p-3">
             ♥
           </Button>
         </div>

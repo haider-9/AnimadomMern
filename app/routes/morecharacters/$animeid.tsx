@@ -61,68 +61,68 @@ export default function AnimeCharacters() {
 
   return (
     <>
-    <title>{`All Character ` }</title>
-    <div className="min-h-screen">
-      <h1 className="mb-8 text-3xl font-bold text-white">Characters</h1>
-      <div className="flex flex-wrap justify-center gap-4">
-        {paginatedCharacters.map((char) => (
-          <CharacterCard
-            key={char.character.mal_id}
-            imageUrl={char.character.images.jpg.image_url}
-            name={char.character.name}
-            role={char.role}
-            hreflink={`/character/${char.character.mal_id}`}
-            animeAppearances={1}
-          />
-        ))}
-      </div>
-      <div className="mt-8 flex justify-center">
-        <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
+      <title>{`All Character `}</title>
+      <div className="min-h-screen">
+        <h1 className="mb-8 text-3xl font-bold text-white">{`All Featured Characters`}</h1>
+        <div className="flex flex-wrap justify-center gap-4">
+          {paginatedCharacters.map((char) => (
+            <CharacterCard
+              key={char.character.mal_id}
+              imageUrl={char.character.images.jpg.image_url}
+              name={char.character.name}
+              role={char.role}
+              hreflink={`/character/${char.character.mal_id}`}
+              animeAppearances={1}
+            />
+          ))}
+        </div>
+        <div className="mt-8 flex justify-center">
+          <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
 
-          {[...Array(totalPages)].map((_, index) => {
-            if (
-              index === 0 ||
-              index === totalPages - 1 ||
-              (index >= currentPage - 2 && index <= currentPage + 2)
-            ) {
-              return (
-                <Button
-                  key={index + 1}
-                  variant={currentPage === index + 1 ? "default" : "outline"}
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  {index + 1}
-                </Button>
-              );
-            }
-            // Show ellipsis for skipped pages
-            if (index === currentPage - 3 || index === currentPage + 3) {
-              return (
-                <span key={index} className="text-white">
-                  ...
-                </span>
-              );
-            }
-            return null;
-          })}
+            {[...Array(totalPages)].map((_, index) => {
+              if (
+                index === 0 ||
+                index === totalPages - 1 ||
+                (index >= currentPage - 2 && index <= currentPage + 2)
+              ) {
+                return (
+                  <Button
+                    key={index + 1}
+                    variant={currentPage === index + 1 ? "default" : "outline"}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </Button>
+                );
+              }
+              // Show ellipsis for skipped pages
+              if (index === currentPage - 3 || index === currentPage + 3) {
+                return (
+                  <span key={index} className="text-white">
+                    ...
+                  </span>
+                );
+              }
+              return null;
+            })}
 
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

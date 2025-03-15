@@ -3,6 +3,8 @@ import Carousel from "~/components/carousel";
 import TrendingAnime from "~/components/trendinganime";
 import Toprated from "~/components/top-rated";
 import Collections from "~/components/collections";
+import { Button } from "~/components/ui/button";
+import { Link } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -32,6 +34,9 @@ export default function Home() {
         <Collections />
         <TrendingAnime />
         <Toprated />
+        <Button asChild className="w-full">
+          <Link to="/topbyyear">Top Anime by Year</Link>
+        </Button>{" "}
       </main>
     </>
   );

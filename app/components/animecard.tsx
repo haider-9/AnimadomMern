@@ -51,11 +51,11 @@ export default function AnimeCard({
               variant="default"
               size="sm"
               asChild
-              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs px-2 py-1"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs "
             >
               <Link to={hreflink}>
                 <LuPlay className="w-3 h-3" />
-                Learn More
+                More
               </Link>
             </Button>
 

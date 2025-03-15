@@ -6,6 +6,7 @@ export default [
   route("upcoming", "./routes/upcoming.tsx"),
   route("about", "./routes/about.tsx"),
   route("anime/:animeId", "./routes/anime/$animeId.tsx"),
+  route("shush", "./routes/secret.tsx"),
   route("studio/:studioname", "./routes/studio/$studioname.tsx"),
   route("genre/:genrename", "./routes/genre/$genrename.tsx"),
   route("voiceactor/:charid", "./routes/voiceactor/$charid.tsx"),
@@ -18,5 +19,6 @@ export default [
   route("trending", "./routes/airing.tsx"),
   route("search/:query", "./routes/search/$query.tsx"),
   route("top_characters", "./routes/characters.tsx"),
-  route("shush", "./routes/secret.tsx")
+  route("topbyyear", "./routes/yearstop.tsx"),
+
 ] satisfies RouteConfig;
