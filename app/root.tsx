@@ -12,6 +12,7 @@ import "./app.css";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { Toaster } from 'react-hot-toast';
+import NotFound from "./routes/NotFound";
 
 
 export const links: Route.LinksFunction = () => [
@@ -63,11 +64,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
+    return <NotFound/>
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;

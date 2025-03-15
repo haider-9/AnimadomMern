@@ -117,11 +117,10 @@ const AuthForm: React.FC = () => {
               damping: 25,
             }}
           >
-            {/* Container for the forms and image */}
             <div className="flex w-full flex-col lg:flex-row">
-              {/* Image section - update the classes and container */}
+              {" "}
               <motion.div
-                className="h-[800px] overflow-hidden w-full lg:w-1/2"
+                className="h-[800px] overflow-hidden w-full lg:w-1/2 hidden lg:block"
                 initial={false}
                 animate={{
                   x: isReversed ? "100%" : "0%",
@@ -166,7 +165,6 @@ const AuthForm: React.FC = () => {
                   </div>
                 </div>
               </motion.div>
-
               {/* Form container - update the classes */}
               <div className="flex w-full lg:w-1/2 items-center justify-center p-4 lg:p-8">
                 <div className="w-full max-w-md">
