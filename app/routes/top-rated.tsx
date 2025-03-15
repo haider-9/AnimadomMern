@@ -51,7 +51,7 @@ export default function TopRated() {
   return (
     <>
     <title>Top Rated Anime</title>
-    <div className="min-h-screen p-4 sm:p-8">
+    <div className="min-h-screen ">
       <h1 className="mb-8 text-3xl font-bold">Top Rated Anime</h1>
       <div className="flex flex-wrap justify-center gap-4">
         {topAnime.map((anime) => (

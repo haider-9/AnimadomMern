@@ -22,7 +22,7 @@ export default function AnimeCard({
   score = 0,
 }: AnimeCardProps) {
   return (
-    <div className="flex-shrink-0 w-[170px] sm:w-[200px] md:w-[250px]">
+    <div className="flex-shrink-0 w-[150px] sm:w-[200px] md:w-[250px]">
       <div
         className="group relative w-full h-[250px] sm:h-[350px] rounded-lg overflow-hidden shadow-lg 
       cursor-pointer"

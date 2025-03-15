@@ -22,14 +22,12 @@ export default function Header() {
   };
 
   return (
-    <div className="w-full py-4 px-4 md:px-6 flex justify-between items-center z-50 border-b relative">
-      {/* Left Section: Logo + Nav */}
+    <div className="w-full py-4 px-4 md:px-6 flex justify-between items-center z-50 border-b mb-8 relative">
       <div className="flex items-center gap-6">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <LucideTv className="h-6 w-6 text-pink-400" />
           <h1 className="text-xl font-semibold font-mono text-white">
-            アニマドム
+            <div className="sm:block hidden">アニマドム</div>
             <span className="sm:hidden">Animadom</span>
           </h1>
         </Link>
@@ -192,7 +190,10 @@ export default function Header() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col h-full">
-                <div className="flex justify-end mb-6">
+                <div className="flex justify-between items-center mb-6">
+                <div className="size-16 rounded-full overflow-hidden">
+                  <img src="/favicon.png" alt="favicon" />
+                </div>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -202,7 +203,7 @@ export default function Header() {
                     <X className="h-5 w-5 text-neutral-300" />
                   </Button>
                 </div>
-
+                
                 {/* Mobile Search */}
                 <div className="mb-6">
                   <div className="bg-white/5 border border-white/10 rounded-full w-full flex items-center">

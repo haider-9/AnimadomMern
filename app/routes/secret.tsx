@@ -86,7 +86,7 @@ export default function TopRated() {
       <title>Top Rated Anime</title>
       <div className="min-h-screen p-4 sm:p-8">
         <h1 className="mb-8 text-3xl font-bold">Top Rated Anime</h1>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="flex flex-wrap justify-center gap-3">
           {topAnime.map((anime) => (
             <AnimeCard
               key={anime.id}

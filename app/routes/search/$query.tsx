@@ -205,16 +205,16 @@ export default function SearchResults() {
 
   return (
     <>
-    <title>Search Results for {params.query}</title>
-    <div className="min-h-screen mt-3">
-      <div className="container mx-auto px-6">
-        <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-zinc-900/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-zinc-800/50">
-          <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 w-full">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
+      <title>Search Results for {params.query}</title>
+      <div className="min-h-screen mt-3">
+        <div className="container mx-auto px-6">
+          <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-zinc-900/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-zinc-800/50">
+            <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 w-full">
+              {tabs.map((tab) => (
+                <Button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
                   relative group flex items-center justify-center gap-2
                   ${
                     activeTab === tab.id
@@ -222,131 +222,135 @@ export default function SearchResults() {
                       : "bg-zinc-800/30 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
                   }
                 `}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                </Button>
+              ))}
+            </div>
+          </nav>
+
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-wrap justify-center gap-4"
+          >
+            {activeTab === "anime" &&
+              results.anime.map((anime) => (
+                <AnimeCard
+                  key={anime.idMal}
+                  imageUrl={anime.coverImage.large}
+                  title={anime.title.english || anime.title.romaji}
+                  hreflink={`/anime/${anime.idMal}`}
+                  score={anime.averageScore / 10}
+                />
+              ))}
+
+            {activeTab === "characters" &&
+              results.characters.map((char) => (
+                <CharacterCard
+                  key={char.mal_id}
+                  imageUrl={char.images?.jpg?.image_url}
+                  name={char.name}
+                  role="Main"
+                  hreflink={`/character/${char.mal_id}`}
+                  animeAppearances={char.anime?.length || 0}
+                />
+              ))}
+
+            {activeTab === "genres" &&
+              results.genres.map((anime) => (
+                <AnimeCard
+                  key={anime.idMal}
+                  imageUrl={anime.coverImage.large}
+                  title={anime.title.english || anime.title.romaji}
+                  hreflink={`/anime/${anime.idMal}`}
+                  score={anime.averageScore / 10}
+                />
+              ))}
+
+            {activeTab === "voiceActors" &&
+              results.voiceActors.map((actor) => (
+                <CharacterCard
+                  key={actor.mal_id}
+                  imageUrl={actor.images?.jpg?.image_url}
+                  name={actor.name}
+                  role="Voice Actor"
+                  hreflink={`/people/${actor.mal_id}`}
+                  animeAppearances={actor.anime?.length || 0}
+                />
+              ))}
+          </motion.div>
+
+          <div className="mt-8 flex justify-center">
+            <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
+              <Button
+                variant="outline"
+                onClick={() => handlePageChange(currentPage[activeTab] - 1)}
+                disabled={currentPage[activeTab] === 1}
               >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
-                {activeTab === tab.id && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                )}
+                Previous
               </Button>
-            ))}
-          </div>
-        </nav>
 
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-wrap justify-center gap-5"
-        >
-          {activeTab === "anime" &&
-            results.anime.map((anime) => (
-              <AnimeCard
-                key={anime.idMal}
-                imageUrl={anime.coverImage.large}
-                title={anime.title.english || anime.title.romaji}
-                hreflink={`/anime/${anime.idMal}`}
-                score={anime.averageScore / 10}
-              />
-            ))}
+              {[...Array(totalPages[activeTab])].map((_, index) => {
+                if (
+                  index === 0 ||
+                  index === totalPages[activeTab] - 1 ||
+                  (index >= currentPage[activeTab] - 2 &&
+                    index <= currentPage[activeTab] + 2)
+                ) {
+                  return (
+                    <Button
+                      key={index + 1}
+                      variant={
+                        currentPage[activeTab] === index + 1
+                          ? "default"
+                          : "outline"
+                      }
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </Button>
+                  );
+                }
 
-          {activeTab === "characters" &&
-            results.characters.map((char) => (
-              <CharacterCard
-                key={char.mal_id}
-                imageUrl={char.images?.jpg?.image_url}
-                name={char.name}
-                role="Main"
-                hreflink={`/character/${char.mal_id}`}
-                animeAppearances={char.anime?.length || 0}
-              />
-            ))}
+                if (
+                  index === currentPage[activeTab] - 3 ||
+                  index === currentPage[activeTab] + 3
+                ) {
+                  return (
+                    <span key={index} className="text-white">
+                      ...
+                    </span>
+                  );
+                }
 
-          {activeTab === "genres" &&
-            results.genres.map((anime) => (
-              <AnimeCard
-                key={anime.idMal}
-                imageUrl={anime.coverImage.large}
-                title={anime.title.english || anime.title.romaji}
-                hreflink={`/anime/${anime.idMal}`}
-                score={anime.averageScore / 10}
-              />
-            ))}
+                return null;
+              })}
 
-          {activeTab === "voiceActors" &&
-            results.voiceActors.map((actor) => (
-              <CharacterCard
-                key={actor.mal_id}
-                imageUrl={actor.images?.jpg?.image_url}
-                name={actor.name}
-                role="Voice Actor"
-                hreflink={`/people/${actor.mal_id}`}
-                animeAppearances={actor.anime?.length || 0}
-              />
-            ))}
-        </motion.div>
-
-        <div className="mt-8 flex justify-center">
-          <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
-            <Button
-              variant="outline"
-              onClick={() => handlePageChange(currentPage[activeTab] - 1)}
-              disabled={currentPage[activeTab] === 1}
-            >
-              Previous
-            </Button>
-
-            {[...Array(totalPages[activeTab])].map((_, index) => {
-              if (
-                index === 0 ||
-                index === totalPages[activeTab] - 1 ||
-                (index >= currentPage[activeTab] - 2 &&
-                  index <= currentPage[activeTab] + 2)
-              ) {
-                return (
-                  <Button
-                    key={index + 1}
-                    variant={
-                      currentPage[activeTab] === index + 1
-                        ? "default"
-                        : "outline"
-                    }
-                    onClick={() => handlePageChange(index + 1)}
-                  >
-                    {index + 1}
-                  </Button>
-                );
-              }
-
-              if (
-                index === currentPage[activeTab] - 3 ||
-                index === currentPage[activeTab] + 3
-              ) {
-                return (
-                  <span key={index} className="text-white">
-                    ...
-                  </span>
-                );
-              }
-
-              return null;
-            })}
-
-            <Button
-              variant="outline"
-              onClick={() => handlePageChange(currentPage[activeTab] + 1)}
-              disabled={currentPage[activeTab] === totalPages[activeTab]}
-            >
-              Next
-            </Button>
+              <Button
+                variant="outline"
+                onClick={() => handlePageChange(currentPage[activeTab] + 1)}
+                disabled={currentPage[activeTab] === totalPages[activeTab]}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

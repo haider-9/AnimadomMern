@@ -94,7 +94,7 @@ export default function Carousel() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 right-8 flex gap-2 z-50 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 opacity-100">
+      <div className="absolute bottom-8 right-8 flex gap-2 z-40 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 opacity-100">
         <button
           onClick={onPrevClick}
           className="flex items-center justify-center size-8 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-300 hover:scale-110 cursor-pointer"
