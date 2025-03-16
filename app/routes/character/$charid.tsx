@@ -64,9 +64,106 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isGalleryExpanded, setIsGalleryExpanded] = useState(false);
+  const [anilistId, setAnilistId] = useState<number | null>(null);
 
+  // First, fetch the character from Jikan API to get the correct mapping
+  useEffect(() => {
+    const fetchMalCharacter = async () => {
+      try {
+        const response = await fetch(
+          `https://api.jikan.moe/v4/characters/${params.charid}`
+        );
+        const data = await response.json();
+
+        if (data.data) {
+          // Now we have the MAL character data
+          // We need to find the corresponding Anilist ID
+          const malId = parseInt(params.charid);
+          await fetchAnilistIdFromMalId(malId);
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching MAL character data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    if (params.charid) {
+      fetchMalCharacter();
+    }
+  }, [params.charid]);
+
+  // Function to find Anilist ID from MAL ID
+  const fetchAnilistIdFromMalId = async (malId: number) => {
+    try {
+      // Use Jikan API to get character info which might contain external links
+      const response = await fetch(
+        `https://api.jikan.moe/v4/characters/${malId}/full`
+      );
+      const data = await response.json();
+
+      if (data.data) {
+        // Try to find Anilist ID from external links if available
+        const anilistLink = data.data.external?.find((link: any) =>
+          link.url?.includes("anilist.co/character/")
+        );
+
+        if (anilistLink) {
+          // Extract Anilist ID from URL
+          const match = anilistLink.url.match(/\/character\/(\d+)/);
+          if (match && match[1]) {
+            setAnilistId(parseInt(match[1]));
+          }
+        } else {
+          // If no direct link, search by name in Anilist
+          await searchCharacterInAnilist(data.data.name);
+        }
+      }
+    } catch (error) {
+      console.error("Error finding Anilist ID:", error);
+      setIsLoading(false);
+    }
+  };
+
+  // Search character by name in Anilist as fallback
+  const searchCharacterInAnilist = async (characterName: string) => {
+    const query = `
+      query ($search: String) {
+        Character(search: $search) {
+          id
+        }
+      }
+    `;
+
+    try {
+      const response = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query,
+          variables: { search: characterName },
+        }),
+      });
+
+      const { data } = await response.json();
+      if (data?.Character?.id) {
+        setAnilistId(data.Character.id);
+      } else {
+        // If all else fails, use the MAL ID directly
+        setAnilistId(parseInt(params.charid));
+      }
+    } catch (error) {
+      console.error("Error searching character in Anilist:", error);
+      setAnilistId(parseInt(params.charid));
+    }
+  };
+
+  // Once we have the Anilist ID, fetch the full character data
   useEffect(() => {
     const fetchCharacterData = async () => {
+      if (!anilistId) return;
+
       const query = `
       query ($id: Int) {
           Character(id: $id) {
@@ -111,7 +208,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             query,
-            variables: { id: parseInt(params.charid) },
+            variables: { id: anilistId },
           }),
         });
 
@@ -127,10 +224,12 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
         setIsLoading(false);
       }
     };
-    if (params.charid) {
+
+    if (anilistId) {
       fetchCharacterData();
     }
-  }, [params.charid]);
+  }, [anilistId]);
+
   useEffect(() => {
     if (characterData?.media?.nodes) {
       const mediaWithImages = characterData.media.nodes.filter(
@@ -145,6 +244,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
       }
     }
   }, [characterData]);
+
   useEffect(() => {
     const fetchGallery = async () => {
       try {
@@ -162,20 +262,39 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
       fetchGallery();
     }
   }, [params.charid]);
+
   if (isLoading) return <Loading />;
   if (!characterData) return <Loading />;
+
   return (
     <>
       <head>
         <title>{`Animadom | ${characterData.name.full} `}</title>
-        <meta name="description" content={characterData.description || `Character profile for ${characterData.name.full}`} />
-        <meta name="keywords" content={`anime, character, ${characterData.name.full}, ${characterData.name.native || ''}`} />
+        <meta
+          name="description"
+          content={
+            characterData.description ||
+            `Character profile for ${characterData.name.full}`
+          }
+        />
+        <meta
+          name="keywords"
+          content={`anime, character, ${characterData.name.full}, ${
+            characterData.name.native || ""
+          }`}
+        />
 
         <meta
           property="og:title"
           content={`Animadom | ${characterData.name.full}`}
         />
-        <meta property="og:description" content={characterData.description || `Character profile for ${characterData.name.full}`} />
+        <meta
+          property="og:description"
+          content={
+            characterData.description ||
+            `Character profile for ${characterData.name.full}`
+          }
+        />
         <meta property="og:image" content={characterData.image.large} />
         <meta property="og:type" content="website" />
         <meta

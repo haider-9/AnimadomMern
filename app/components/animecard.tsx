@@ -22,15 +22,13 @@ export default function AnimeCard({
   score = 0,
 }: AnimeCardProps) {
   return (
-    <div className="flex-shrink-0 w-[150px] sm:w-[200px] md:w-[250px]">
-      <div
-        className="group relative w-full h-[250px] sm:h-[350px] rounded-lg overflow-hidden shadow-lg 
-      cursor-pointer"
-      >
+    <div className="w-[150px] sm:w-[200px] md:w-[250px]">
+      <div className="relative w-full h-[250px] sm:h-[350px] rounded-lg overflow-hidden shadow-lg">
         <img
           src={imageUrl || "https://dummyimage.com/500x500"}
           alt={title}
-          className="size-full object-cover object-center transition-all duration-500 ease-in-out group-hover:blur-[2px] group-hover:scale-105"
+          className="size-full object-cover object-center"
+          loading="lazy"
         />
 
         {/* Score Badge */}
@@ -38,8 +36,8 @@ export default function AnimeCard({
           <LuStar className="w-3 h-3" /> {score}
         </div>
 
-        {/* Hover Overlay */}
-        <div className="px-2 py-3 absolute opacity-0 group-hover:opacity-100 inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end translate-y-6 transition-all duration-500 ease-in-out group-hover:translate-y-0">
+        {/* Overlay */}
+        <div className="px-2 py-3 absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end sm:opacity-0 sm:hover:opacity-100 transition-opacity duration-200">
           {/* Title */}
           <h3 className="text-white font-bold mb-2 text-sm line-clamp-2">
             {title}
@@ -54,7 +52,7 @@ export default function AnimeCard({
               className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs"
             >
               <Link to={hreflink}>
-                <LuPlay className="w-3 h-3" />
+                <LuPlay className="w-full h-3" />
                 <span className="hidden sm:inline ml-1">Learn More</span>
               </Link>
             </Button>
