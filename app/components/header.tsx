@@ -1,7 +1,7 @@
 import { LucideTv, Search, User, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { FaSearch, FaRegTimesCircle } from "react-icons/fa";
 import {
   DropdownMenu,
@@ -10,15 +10,24 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
+import RandomButton from "./randombutton";
+import AuthContext from "~/context/AuthContext";
 
 export default function Header() {
   const [search, setSearch] = useState("");
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useContext(AuthContext);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -79,11 +88,13 @@ export default function Header() {
           </ul>
         </nav>
       </div>
-
+      <div className="hidden lg:block">
+        <RandomButton />
+      </div>
       {/* Right Section: Search + Actions */}
       <div className="flex items-center gap-4 w-full max-w-lg justify-end">
         {/* Search Bar - Hide on small screens */}
-        <div className="relative hidden md:block">
+        <div className="relative hidden lg:block">
           <div
             className={`flex items-center transition-all duration-300 ease-out ${
               isSearchExpanded
@@ -133,28 +144,32 @@ export default function Header() {
         </div>
 
         {/* Auth Buttons - Hide on small screens */}
-        <div className="hidden md:flex gap-2">
-          <Link to="/getstarted">
-            <Button size="sm">Get Started</Button>
-          </Link>
+        <div className="hidden lg:flex gap-2">
+          {!isAuthenticated ? (
+            <Link to="/getstarted">
+              <Button size="sm">Get Started</Button>
+            </Link>
+          ) : null}
         </div>
 
         {/* User Profile Dropdown - Hide on small screens */}
-        <div className="hidden md:block">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <User className="h-5 w-5 text-neutral-300" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white">
-              <Link to="/profile">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="hidden lg:block">
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <User className="h-5 w-5 text-neutral-300" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-neutral-900 border-neutral-800 text-white">
+                <Link to={`/user/${user?.name}`}>
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
         </div>
 
         <Button
@@ -191,9 +206,9 @@ export default function Header() {
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center mb-6">
-                <div className="size-16 rounded-full overflow-hidden">
-                  <img src="/favicon.png" alt="favicon" />
-                </div>
+                  <div className="size-16 rounded-full overflow-hidden">
+                    <img src="/favicon.png" alt="favicon" />
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -203,7 +218,7 @@ export default function Header() {
                     <X className="h-5 w-5 text-neutral-300" />
                   </Button>
                 </div>
-                
+
                 {/* Mobile Search */}
                 <div className="mb-6">
                   <div className="bg-white/5 border border-white/10 rounded-full w-full flex items-center">
@@ -278,37 +293,43 @@ export default function Header() {
                   </ul>
                 </nav>
 
+                <RandomButton />
                 {/* Mobile Auth */}
                 <div className="mt-auto">
-                  <Link
-                    to="/getstarted"
-                    className="w-full block"
-                    onClick={() => setIsSidebarOpen(false)}
-                  >
-                    <Button size="sm" className="w-full">
-                      Get Started
-                    </Button>
-                  </Link>
-
-                  <div className="mt-4 flex flex-col gap-2 text-neutral-300">
+                  {!isAuthenticated ? (
                     <Link
-                      to="/profile"
-                      className="hover:text-white transition-colors duration-200 py-2"
+                      to="/getstarted"
+                      className="w-full block"
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                      Profile
+                      <Button size="sm" className="w-full">
+                        Get Started
+                      </Button>
                     </Link>
-                    <Link
-                      to="/settings"
-                      className="hover:text-white transition-colors duration-200 py-2"
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
-                      Settings
-                    </Link>
-                    <button className="text-left hover:text-white transition-colors duration-200 py-2">
-                      Logout
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="mt-4 flex flex-col gap-2 text-neutral-300">
+                      <Link
+                        to={`/user/${user?.name}`}
+                        className="hover:text-white transition-colors duration-200 py-2"
+                        onClick={() => setIsSidebarOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="hover:text-white transition-colors duration-200 py-2"
+                        onClick={() => setIsSidebarOpen(false)}
+                      >
+                        Settings
+                      </Link>
+                      <button 
+                        className="text-left hover:text-white transition-colors duration-200 py-2"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

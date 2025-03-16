@@ -7,18 +7,15 @@ export const signup = async (data) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Ensure cookies are sent
       body: JSON.stringify(data),
     });
 
     const result = await response.json();
-
     console.log("Signup API response:", result);
 
-    if (result.statusCode === 201 && result.data) {
-      return {
-        token: result.data.token,
-        user: result.data.user,
-      };
+    if (response.ok && result.data) {
+      return { user: result.data.user };
     }
 
     return { error: result.message || "Signup failed" };
@@ -36,18 +33,19 @@ export const login = async (data) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
     const result = await response.json();
-
     console.log("Login API response:", result);
 
-    if (result.statusCode === 200 && result.data) {
-      return {
-        token: result.data.token,
-        user: result.data.user,
-      };
+    if (response.ok && result.data) {
+      // If the server returns a token directly, store it
+      if (result.data.token) {
+        localStorage.setItem("token", result.data.token);
+      }
+      return { user: result.data.user };
     }
 
     return { error: result.message || "Login failed" };
@@ -57,82 +55,50 @@ export const login = async (data) => {
   }
 };
 
-// Add Anime to a List
-export const addAnimeToList = async ({
-  userId,
-  listType,
-  animeId,
-  name,
-  imageUrl,
-}) => {
+export const logout = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/user/list/add`, {
+    const response = await fetch(`${API_URL}/api/logout`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId, listType, animeId, name, imageUrl }),
+      credentials: "include",
     });
 
-    const result = await response.json();
-
-    console.log("Add Anime Response:", result);
-
-    if (result.message === "Anime added successfully") {
-      return { success: true, user: result.user };
+    if (!response.ok) {
+      return { error: "Logout failed" };
     }
 
-    return { error: result.message || "Failed to add anime" };
+    return { success: true };
   } catch (error) {
     console.error("Error:", error);
     return { error: "Network error occurred" };
   }
 };
 
-// Remove Anime from a List
-export const removeAnimeFromList = async ({ userId, listType, animeId }) => {
+// Helper function to get token
+export const getToken = () => localStorage.getItem("token");
+
+export const checkSession = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/user/list/remove`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId, listType, animeId }),
+    const response = await fetch(`${API_URL}/api/check-session`, {
+      method: "GET",
+      credentials: "include",
     });
 
-    const result = await response.json();
-
-    console.log("Remove Anime Response:", result);
-
-    if (result.message === "Anime removed successfully") {
-      return { success: true, user: result.user };
+    if (response.status === 401) {
+      console.warn("Session expired or unauthorized.");
+      return { isAuthenticated: false, user: null };
     }
-
-    return { error: result.message || "Failed to remove anime" };
-  } catch (error) {
-    console.error("Error:", error);
-    return { error: "Network error occurred" };
-  }
-};
-
-// Get Anime List
-export const getAnimeList = async (userId, listType) => {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/user/list/${userId}/${listType}`
-    );
 
     const result = await response.json();
 
-    console.log(`Get ${listType} List Response:`, result);
-
-    if (result.list) {
-      return { success: true, list: result.list };
-    }
-
-    return { error: result.message || "Failed to fetch anime list" };
+    // Make sure we always return the expected structure
+    return {
+      isAuthenticated: result.data?.user ? true : false,
+      user: result.data?.user || null,
+    };
   } catch (error) {
-    console.error("Error:", error);
-    return { error: "Network error occurred" };
+    console.error("Error checking session:", error);
+    // Always return the expected structure even in error cases
+    return { isAuthenticated: false, user: null };
   }
 };
+

@@ -13,6 +13,7 @@ import Header from "./components/header";
 import Footer from "./components/footer";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./routes/NotFound";
+import { AuthProvider } from "./context/AuthContext";
 
 
 export const links: Route.LinksFunction = () => [
@@ -52,15 +53,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
   export default function App() {
     return (
-      <>
-        <Toaster position="top-right" />
-        <Outlet />
-      </>
+      <AuthProvider>
+        <>
+          <Toaster position="top-right" />
+          <Outlet />
+        </>
+      </AuthProvider>
     );
-  }
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  }export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
-  let details = "An unexpected error occurred.";
+  let details = "Its a free API, it has its own limits. 💀";;
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {

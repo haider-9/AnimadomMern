@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { motion } from "framer-motion";
 import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
+import AuthContext from "~/context/AuthContext";
 
 type FormState = "signup" | "signin";
 interface FormEvent {
@@ -49,6 +50,33 @@ const AuthForm: React.FC = () => {
     }));
   };
 
+  const { login: loginContext } = useContext(AuthContext);
+
+  const handlelogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Login attempt with:", loginData);
+
+    try {
+      const response = await login(loginData);
+      console.log("Login response:", response);
+
+      if (!response || response.error) {
+        toast.error(response?.error || "Invalid credentials");
+        return;
+      }
+
+      // Update the auth context with the user data
+      loginContext(response.user);
+      console.log("Context updated with user:", response.user);
+
+      toast.success("Login successful!");
+      navigate(`/user/${response.user.name}`);
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please try again.");
+      console.error("Login error:", error);
+    }
+  };
+  // Similarly in handlesignup function:
   const handlesignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -71,30 +99,6 @@ const AuthForm: React.FC = () => {
     } catch (error: any) {
       toast.error(error.message || "An error occurred during signup");
       console.error("Signup error:", error);
-    }
-  };
-
-  const handlelogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const response = await login(loginData);
-
-      if (!response || response.error) {
-        toast.error(response?.error || "Invalid credentials");
-        return;
-      }
-
-      // Store token in localStorage
-      if (response.token) {
-        localStorage.setItem("token", response.token);
-      }
-
-      toast.success("Login successful!");
-      navigate(`/user/${response.user.name}`);
-    } catch (error: any) {
-      toast.error(error.message || "Login failed. Please try again.");
-      console.error("Login error:", error);
     }
   };
 
