@@ -200,12 +200,12 @@ export default function SearchResults() {
     { id: "genres", label: "Genres", icon: "🏷️" },
     { id: "voiceActors", label: "Voice Actors", icon: "🎤" },
   ];
-
+  
   if (loading) return <Loading />;
 
   return (
     <>
-      <title>Search Results for {params.query}</title>
+      <title>Animadom | Search Results</title>
       <div className="min-h-screen mt-3">
         <div className="container mx-auto px-6">
           <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-zinc-900/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-zinc-800/50">

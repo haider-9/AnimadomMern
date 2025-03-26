@@ -3,8 +3,8 @@ import CollectionCard from "../components/collectioncard";
 import Loading from "~/components/loader";
 import { Button } from "~/components/ui/button";
 
-const KITSU_CATEGORIES_API = "https://kitsu.io/api/edge/categories";
-const KITSU_ANIME_API = "https://kitsu.io/api/edge/anime";
+const ANILIST_API = "https://graphql.anilist.co";
+const GENRES_PER_PAGE = 20; // Number of genres to show per page
 
 export default function Collections() {
   const [collections, setCollections] = useState<
@@ -18,7 +18,6 @@ export default function Collections() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const collectionsPerPage = 20;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -29,41 +28,76 @@ export default function Collections() {
     const fetchAnimeCollections = async () => {
       setLoading(true);
       try {
-        const categoriesResponse = await fetch(
-          `${KITSU_CATEGORIES_API}?page[limit]=20&page[offset]=${
-            (currentPage - 1) * collectionsPerPage
-          }`
-        );
-        if (!categoriesResponse.ok)
-          throw new Error("Failed to fetch categories");
-        const categoriesData = await categoriesResponse.json();
-        setTotalPages(Math.ceil(categoriesData.data.length / collectionsPerPage));
+        // First fetch the total count of genres to calculate pages
+        const countQuery = `
+          query {
+            GenreCollection
+          }
+        `;
 
-        const categories = categoriesData.data.map((c: any) => ({
-          id: c.id,
-          title: c.attributes.title,
-          slug: c.attributes.slug,
-        }));
+        const countResponse = await fetch(ANILIST_API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ query: countQuery }),
+        });
 
+        if (!countResponse.ok) throw new Error("Failed to fetch genre count");
+        const countData = await countResponse.json();
+        const totalGenres = countData.data.GenreCollection.length;
+        setTotalPages(Math.ceil(totalGenres / GENRES_PER_PAGE));
+
+        // Get the genres for the current page
+        const startIdx = (currentPage - 1) * GENRES_PER_PAGE;
+        const endIdx = startIdx + GENRES_PER_PAGE;
+        const currentGenres = countData.data.GenreCollection.slice(startIdx, endIdx);
+
+        // For each genre, fetch popular anime
         const collectionsData = await Promise.all(
-          categories.slice(0, collectionsPerPage).map(async (category: any) => {
-            const animeResponse = await fetch(
-              `${KITSU_ANIME_API}?filter[categories]=${category.id}&page[limit]=20}&sort=-averageRating`
-            );
+          currentGenres.map(async (genre: string) => {
+            const animeQuery = `
+              query ($genre: String, $perPage: Int) {
+                Page(perPage: $perPage) {
+                  media(type: ANIME, genre: $genre, sort: POPULARITY_DESC) {
+                    coverImage {
+                      medium
+                    }
+                    title {
+                      romaji
+                    }
+                  }
+                }
+              }
+            `;
+
+            const animeResponse = await fetch(ANILIST_API, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              body: JSON.stringify({
+                query: animeQuery,
+                variables: {
+                  genre: genre,
+                  perPage: 4, // Get 4 anime per genre for the collection card
+                },
+              }),
+            });
+
             if (!animeResponse.ok) throw new Error("Failed to fetch anime");
             const animeData = await animeResponse.json();
 
-            const validAnime = animeData.data
-              .filter((anime: any) => anime.attributes.posterImage?.small)
-              .sort(() => Math.random() - 0.5)
+            const validAnime = animeData.data.Page.media
+              .filter((anime: any) => anime.coverImage?.medium)
               .slice(0, 4);
 
             return {
-              title: `${category.title}`,
-              slug: `${category.slug}`,
-              images: validAnime.map(
-                (anime: any) => anime.attributes.posterImage.small
-              ),
+              title: genre,
+              slug: genre.toLowerCase().replace(/\s+/g, "-"),
+              images: validAnime.map((anime: any) => anime.coverImage.medium),
             };
           })
         );
