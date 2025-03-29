@@ -42,7 +42,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <div className="container">
           <Header />
+          <div  className="mt-10">
+
           {children}
+          </div>
         </div>
         <ScrollRestoration />
         <Scripts />

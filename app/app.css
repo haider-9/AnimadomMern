@@ -1,10 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
@@ -30,7 +31,7 @@ body {
   --popover-foreground: oklch(0.98 0.01 90);
   
   /* Primary accent colors - vibrant but not overwhelming */
-  --primary: oklch(0.65 0.25 275); /* Soft electric purple */
+  --primary: oklch(0.60 0.25 200); /* Changed to a blue tone */
   --primary-foreground: oklch(0.98 0.01 90);
   
   /* Secondary colors */
@@ -52,10 +53,10 @@ body {
   /* UI element colors */
   --border: oklch(0.25 0.03 260);
   --input: oklch(0.25 0.03 260);
-  --ring: oklch(0.65 0.25 275); /* Matches primary */
+  --ring: oklch(0.60 0.25 200); /* Matches new primary */
   
   /* Chart colors - harmonious palette */
-  --chart-1: oklch(0.65 0.25 275); /* Primary purple */
+  --chart-1: oklch(0.60 0.25 200); /* New primary blue */
   --chart-2: oklch(0.72 0.18 170);  /* Teal */
   --chart-3: oklch(0.78 0.20 60);   /* Golden yellow */
   --chart-4: oklch(0.68 0.22 310);  /* Magenta */
@@ -64,12 +65,12 @@ body {
   /* Sidebar colors - slightly darker than background */
   --sidebar: oklch(0.10 0.02 260);
   --sidebar-foreground: oklch(0.98 0.01 90);
-  --sidebar-primary: oklch(0.65 0.25 275); /* Primary purple */
+  --sidebar-primary: oklch(0.60 0.25 200); /* New primary blue */
   --sidebar-primary-foreground: oklch(0.98 0.01 90);
   --sidebar-accent: oklch(0.68 0.22 310); /* Magenta */
   --sidebar-accent-foreground: oklch(0.98 0.01 90);
   --sidebar-border: oklch(0.18 0.02 260);
-  --sidebar-ring: oklch(0.65 0.25 275); /* Primary purple */
+  --sidebar-ring: oklch(0.60 0.25 200); /* New primary blue */
 }
 
 /* Enhanced Light theme - airy and fresh */
@@ -87,7 +88,7 @@ body {
   --popover-foreground: oklch(0.18 0.05 260);
   
   /* Primary accent colors - vibrant but not harsh */
-  --primary: oklch(0.55 0.23 270); /* Royal purple */
+  --primary: oklch(0.50 0.23 200); /* Changed to a lighter blue */
   --primary-foreground: oklch(0.99 0.01 90);
   
   /* Secondary colors - soft grays */
@@ -109,10 +110,10 @@ body {
   /* UI element colors - very subtle borders */
   --border: oklch(0.85 0.03 90);
   --input: oklch(0.85 0.03 90);
-  --ring: oklch(0.55 0.23 270); /* Matches primary */
+  --ring: oklch(0.50 0.23 200); /* Matches new primary */
   
   /* Chart colors - slightly muted but vibrant */
-  --chart-1: oklch(0.55 0.23 270); /* Primary purple */
+  --chart-1: oklch(0.50 0.23 200); /* New primary blue */
   --chart-2: oklch(0.65 0.17 170);  /* Teal */
   --chart-3: oklch(0.75 0.18 60);   /* Golden yellow */
   --chart-4: oklch(0.6 0.2 320);   /* Pink */
@@ -121,12 +122,12 @@ body {
   /* Sidebar colors - very light gray */
   --sidebar: oklch(0.96 0.01 90);
   --sidebar-foreground: oklch(0.18 0.05 260);
-  --sidebar-primary: oklch(0.55 0.23 270); /* Primary purple */
+  --sidebar-primary: oklch(0.50 0.23 200); /* New primary blue */
   --sidebar-primary-foreground: oklch(0.99 0.01 90);
   --sidebar-accent: oklch(0.6 0.2 320); /* Pink */
   --sidebar-accent-foreground: oklch(0.99 0.01 90);
   --sidebar-border: oklch(0.88 0.02 90);
-  --sidebar-ring: oklch(0.55 0.23 270); /* Primary purple */
+  --sidebar-ring: oklch(0.50 0.23 200); /* New primary blue */
 }
 
 @theme inline {
@@ -176,6 +177,21 @@ body {
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+
+  ::-webkit-scrollbar {
+    @apply rounded-full size-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full hover:bg-muted/80 transition-colors;
+  }
 
 @layer utilities {
   .container {

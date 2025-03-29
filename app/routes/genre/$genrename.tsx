@@ -15,6 +15,7 @@ import {
 
 interface AnimeData {
   id: number;
+  idMal: number;
   title: {
     romaji: string;
     english: string | null;
@@ -22,13 +23,11 @@ interface AnimeData {
   };
   coverImage: {
     large: string;
-    color: string | null;
+    color?: string | null;
   };
-  seasonYear: number | null;
-  genres: string[];
-  averageScore: number | null;
-  popularity: number | null;
-  format: "TV" | "TV_SHORT" | "MOVIE" | "SPECIAL" | "OVA" | "ONA" | "MUSIC";
+  startDate: {
+    year: number;
+  };
 }
 
 type SortOption =
@@ -84,8 +83,8 @@ export default function GenrePage() {
 
       try {
         const query = `
-          query ($genre: String, $page: Int, $perPage: Int, $sort: [MediaSort], $format: MediaFormat) {
-            Page(page: $page, perPage: $perPage) {
+          query ($term: String, $page: Int, $perPage: Int, $sort: [MediaSort], $format: MediaFormat) {
+            byGenre: Page(page: $page, perPage: $perPage) {
               pageInfo {
                 total
                 perPage
@@ -93,8 +92,9 @@ export default function GenrePage() {
                 lastPage
                 hasNextPage
               }
-              media(genre: $genre, sort: $sort, type: ANIME, format: $format) {
+              media(genre: $term, type: ANIME, sort: $sort, format: $format) {
                 id
+                idMal
                 title {
                   romaji
                   english
@@ -104,18 +104,41 @@ export default function GenrePage() {
                   large
                   color
                 }
-                seasonYear
-                genres
-                averageScore
-                popularity
-                format
+                startDate {
+                  year
+                }
+              }
+            }
+            byTag: Page(page: $page, perPage: $perPage) {
+              pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+              }
+              media(tag: $term, type: ANIME, sort: $sort, format: $format) {
+                id
+                idMal
+                title {
+                  romaji
+                  english
+                  native
+                }
+                coverImage {
+                  large
+                  color
+                }
+                startDate {
+                  year
+                }
               }
             }
           }
         `;
 
         const variables = {
-          genre: genrename,
+          term: genrename,
           page: currentPage,
           perPage: 24,
           sort: [sortBy],
@@ -140,12 +163,32 @@ export default function GenrePage() {
 
         const { data } = await response.json();
 
-        if (!data || !data.Page) {
+        if (!data) {
           throw new Error("Invalid data structure received");
         }
 
-        setAnimeList(data.Page.media);
-        setTotalPages(data.Page.pageInfo.lastPage);
+        // Combine results and remove duplicates based on id
+        const byGenreResults = data.byGenre?.media || [];
+        const byTagResults = data.byTag?.media || [];
+        
+        // Use a Map to deduplicate by id
+        const uniqueAnimeMap = new Map();
+        [...byGenreResults, ...byTagResults].forEach(anime => {
+          if (!uniqueAnimeMap.has(anime.id)) {
+            uniqueAnimeMap.set(anime.id, anime);
+          }
+        });
+        
+        const combinedResults = Array.from(uniqueAnimeMap.values());
+        setAnimeList(combinedResults);
+
+        // Use the larger of the two page counts
+        setTotalPages(
+          Math.max(
+            data.byGenre?.pageInfo?.lastPage || 1,
+            data.byTag?.pageInfo?.lastPage || 1
+          )
+        );
       } catch (error) {
         console.error("Error fetching anime:", error);
         setError(
@@ -236,7 +279,9 @@ export default function GenrePage() {
 
   return (
     <>
-      <title>{`Animadom | ${(genrename)?.charAt(0).toUpperCase()}${(genrename)?.slice(1)} Anime`}</title>
+      <title>{`Animadom | ${genrename
+        ?.charAt(0)
+        .toUpperCase()}${genrename?.slice(1)} Anime`}</title>
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -245,8 +290,11 @@ export default function GenrePage() {
           <div className="flex gap-2 md:flex-row flex-col">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center md:text-sm text-xs gap-1">
-              <FilterIcon className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  className="flex items-center md:text-sm text-xs gap-1"
+                >
+                  <FilterIcon className="h-4 w-4" />
                   Sort By
                 </Button>
               </DropdownMenuTrigger>
@@ -281,8 +329,11 @@ export default function GenrePage() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center md:text-sm text-xs gap-1">
-              Format
+                <Button
+                  variant="outline"
+                  className="flex items-center md:text-sm text-xs gap-1"
+                >
+                  Format
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>

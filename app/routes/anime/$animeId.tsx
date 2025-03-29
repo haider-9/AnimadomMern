@@ -273,7 +273,7 @@ export default function AnimeDescription({
                             key={index}
                             className={`text-sm px-4 py-2 rounded-xl transition-all duration-300 ${
                               studio.isAnimationStudio
-                                ? "bg-primary/30 text-primary-foreground border border-primary/40 hover:bg-primary/40"
+                                ? "bg-primary/30 text-secondary-foreground border border-primary/40 hover:bg-primary/40"
                                 : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                             }`}
                           >
@@ -301,10 +301,10 @@ export default function AnimeDescription({
                       {/* Next Episode */}
                       {nextEpisode && (
                         <div className="flex items-center gap-3 bg-accent/20 p-4 rounded-xl">
-                          <span className="text-accent-foreground">
+                          <span className="text-muted-foreground">
                             Next Episode {nextEpisode.episode}:
                           </span>
-                          <span className="text-accent-foreground font-medium">
+                          <span className="text-foreground font-medium">
                             {Math.floor(nextEpisode.timeUntilAiring / 86400)}{" "}
                             days
                           </span>
