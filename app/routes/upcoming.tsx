@@ -165,11 +165,14 @@ export default function TrendingAnime() {
       <title>Animadom | Upcoming Anime</title>
       <section className="py-8">
         <div className="flex justify-between items-center mb-6 px-4">
-          <h2 className="text-2xl font-bold">Upcoming Anime</h2>
-          <div className="flex gap-2">
+          <h2 className="md:text-2xl text-xl font-bold">Upcoming Anime</h2>
+          <div className="flex gap-2 flex-col md:flex-row">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  className="flex items-center md:text-sm text-xs gap-1"
+                >
                   <FilterIcon className="h-4 w-4" />
                   Sort: {getSortLabel(sortBy)}
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
@@ -202,7 +205,10 @@ export default function TrendingAnime() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  className="flex items-center md:text-sm text-xs gap-1"
+                >
                   Format: {getFormatLabel(format)}
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>

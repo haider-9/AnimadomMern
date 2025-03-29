@@ -103,11 +103,11 @@ export default function PersonDetails() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-500/10 p-6 rounded-xl border border-red-500/20">
-          <h2 className="text-red-500 text-xl font-semibold mb-2">
+        <div className="bg-destructive/10 p-6 rounded-xl border border-destructive/20">
+          <h2 className="text-destructive text-xl font-semibold mb-2">
             Error Loading Data
           </h2>
-          <p className="text-red-400">{error}</p>
+          <p className="text-destructive/80">{error}</p>
         </div>
       </div>
     );
@@ -115,11 +115,11 @@ export default function PersonDetails() {
   if (!personData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-yellow-500/10 p-6 rounded-xl border border-yellow-500/20">
-          <h2 className="text-yellow-500 text-xl font-semibold mb-2">
+        <div className="bg-muted/10 p-6 rounded-xl border border-muted/20">
+          <h2 className="text-muted-foreground text-xl font-semibold mb-2">
             No Data Found
           </h2>
-          <p className="text-yellow-400">Could not find person with ID: {id}</p>
+          <p className="text-muted-foreground/80">Could not find person with ID: {id}</p>
         </div>
       </div>
     );
@@ -134,7 +134,7 @@ export default function PersonDetails() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="min-h-screen pb-16"
+          className="min-h-screen pb-16 theme-transition"
         >
           <div className="relative h-[40vh] overflow-hidden">
             <motion.img
@@ -146,7 +146,7 @@ export default function PersonDetails() {
               className="absolute w-full h-full object-cover object-center"
               style={{ filter: "brightness(0.6) blur(8px)" }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background" />
           </div>
 
           <div className="container mx-auto px-4 -mt-32 relative z-10">
@@ -155,7 +155,7 @@ export default function PersonDetails() {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-6 border border-zinc-700/50"
+                  className="bg-card/40 backdrop-blur-xl rounded-2xl p-6 border border-border"
                 >
                   <img
                     src={personData.images.jpg.image_url}
@@ -166,23 +166,23 @@ export default function PersonDetails() {
                     <div>
                       <h1 className="text-2xl font-bold">{personData.name}</h1>
                       {personData.alternate_names?.length > 0 && (
-                        <p className="text-zinc-400">
+                        <p className="text-muted-foreground">
                           {personData.alternate_names[0]}
                         </p>
                       )}
                     </div>
                     {personData.favorites > 0 && (
-                      <div className="flex items-center gap-2 bg-pink-500/20 p-4 rounded-xl">
-                        <FaHeart className="text-pink-500" />
-                        <span className="text-pink-200 font-medium">
+                      <div className="flex items-center gap-2 bg-primary/20 p-4 rounded-xl">
+                        <FaHeart className="text-primary" />
+                        <span className="text-primary-foreground font-medium">
                           {personData.favorites.toLocaleString()} Favorites
                         </span>
                       </div>
                     )}
                     {personData.birthday && (
-                      <div className="flex items-center gap-2 bg-zinc-700/30 p-4 rounded-xl">
-                        <FaBirthdayCake className="text-zinc-400" />
-                        <span className="text-zinc-300">
+                      <div className="flex items-center gap-2 bg-muted/30 p-4 rounded-xl">
+                        <FaBirthdayCake className="text-muted-foreground" />
+                        <span className="text-foreground">
                           {new Date(personData.birthday).toLocaleDateString(
                             "en-US",
                             {
@@ -202,15 +202,15 @@ export default function PersonDetails() {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
+                  className="bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-border"
                 >
                   <h2 className="text-2xl font-semibold mb-4">About</h2>
-                  <div className="text-zinc-300 leading-relaxed prose prose-invert max-w-none">
+                  <div className="text-muted-foreground leading-relaxed prose prose-invert max-w-none">
                     {personData.about || "No description available."}
                   </div>
                 </motion.div>
 
-                <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-zinc-900/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-zinc-800/50">
+                <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-card/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-border">
                   <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 w-full">
                     {tabs.map((tab) => (
                       <Button
@@ -222,8 +222,8 @@ export default function PersonDetails() {
                           relative group flex items-center justify-center gap-2
                           ${
                             activeTab === tab.id
-                              ? "bg-yellow-500/10 text-yellow-500 ring-1 ring-yellow-500/20"
-                              : "bg-zinc-800/30 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                              ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                              : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                           }
                         `}
                       >
@@ -232,7 +232,7 @@ export default function PersonDetails() {
                         {activeTab === tab.id && (
                           <motion.div
                             layoutId="activeTab"
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                             transition={{
                               type: "spring",
                               stiffness: 500,
@@ -260,7 +260,7 @@ export default function PersonDetails() {
                         <Link
                           to={`/character/${voice.character.mal_id}`}
                           key={`${voice.character.mal_id}-${voice.anime.mal_id}`}
-                          className="group bg-zinc-800/40 rounded-xl overflow-hidden hover:bg-zinc-700/40 transition-all duration-300"
+                          className="group bg-card/40 rounded-xl overflow-hidden hover:bg-card/60 transition-all duration-300"
                         >
                           <div className="flex items-center gap-4 p-4">
                             <img
@@ -269,10 +269,10 @@ export default function PersonDetails() {
                               className="w-20 h-28 object-cover rounded-lg transition-transform group-hover:scale-105"
                             />
                             <div className="flex-1">
-                              <h3 className="font-medium text-lg text-white group-hover:text-purple-300 transition-colors">
+                              <h3 className="font-medium text-lg text-foreground group-hover:text-primary transition-colors">
                                 {voice.character.name}
                               </h3>
-                              <p className="text-sm text-zinc-400 mt-1">
+                              <p className="text-sm text-muted-foreground mt-1">
                                 {voice.anime.title}
                               </p>
                             </div>
@@ -287,9 +287,9 @@ export default function PersonDetails() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
-                      className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50 text-center"
+                      className="bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-border text-center"
                     >
-                      <p className="text-zinc-400">
+                      <p className="text-muted-foreground">
                         No character roles found for this person.
                       </p>
                     </motion.div>
@@ -308,7 +308,7 @@ export default function PersonDetails() {
                         <Link
                           to={`/anime/${entry.anime.mal_id}`}
                           key={entry.anime.mal_id}
-                          className="group bg-zinc-800/40 rounded-xl overflow-hidden hover:bg-zinc-700/40 transition-all duration-300"
+                          className="group bg-card/40 rounded-xl overflow-hidden hover:bg-card/60 transition-all duration-300"
                         >
                           <div className="flex items-center gap-4 p-4">
                             <img
@@ -317,7 +317,7 @@ export default function PersonDetails() {
                               className="w-20 h-28 object-cover rounded-lg transition-transform group-hover:scale-105"
                             />
                             <div className="flex-1">
-                              <h3 className="font-medium text-lg text-white group-hover:text-purple-300 transition-colors">
+                              <h3 className="font-medium text-lg text-foreground group-hover:text-primary transition-colors">
                                 {entry.anime.title}
                               </h3>
                               {entry.anime.score && (
@@ -328,7 +328,7 @@ export default function PersonDetails() {
                                   </span>
                                 </div>
                               )}
-                              <p className="text-sm text-zinc-400 mt-1">
+                              <p className="text-sm text-muted-foreground mt-1">
                                 {entry.position}
                               </p>
                             </div>
@@ -343,9 +343,9 @@ export default function PersonDetails() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
-                      className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50 text-center"
+                      className="bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-border text-center"
                     >
-                      <p className="text-zinc-400">
+                      <p className="text-muted-foreground">
                         No media found for this person.
                       </p>
                     </motion.div>

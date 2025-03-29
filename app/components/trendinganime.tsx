@@ -70,11 +70,11 @@ export default function TrendingAnime() {
   return (
     <section className="py-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold mb-6 px-4">Trending Now</h2>
-        <Link to='/trending'>
-        <Button variant="default" size="sm">
-          See All
-        </Button>
+        <h2 className="text-2xl font-bold px-4">Trending Now</h2>
+        <Link to="/trending">
+          <Button variant="default" size="sm">
+            See All
+          </Button>
         </Link>
       </div>
       <div className="flex flex-wrap max-md:justify-center justify-center gap-4 md:w-[95%] mx-auto">

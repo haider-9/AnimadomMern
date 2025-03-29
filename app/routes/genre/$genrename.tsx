@@ -242,16 +242,16 @@ export default function GenrePage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold capitalize">{genrename} Anime</h1>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:flex-row flex-col">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <FilterIcon className="h-4 w-4" />
+              <Button variant="outline" className="flex items-center md:text-sm text-xs gap-1">
+              <FilterIcon className="h-4 w-4" />
                   Sort By
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Sort Options</DropdownMenuLabel>
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSortBy("POPULARITY_DESC")}>
                   Popularity (High to Low)
@@ -281,13 +281,13 @@ export default function GenrePage() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Filter Format
+              <Button variant="outline" className="flex items-center md:text-sm text-xs gap-1">
+              Format
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Anime Format</DropdownMenuLabel>
+                <DropdownMenuLabel>Format</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setFormatFilter(null)}>
                   All Formats

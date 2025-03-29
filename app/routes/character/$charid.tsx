@@ -307,6 +307,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          className="theme-transition"
         >
           {/* Hero Section */}
           <div className="relative h-[40vmin] overflow-hidden">
@@ -318,7 +319,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
               alt={characterData.name.full}
               className="absolute w-full h-full object-cover object-center brightness-75"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background" />
           </div>
 
           {/* Main Content */}
@@ -329,7 +330,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-6 border border-zinc-700/50 h-full"
+                  className="bg-card/40 backdrop-blur-xl rounded-2xl p-6 border border-border h-full"
                 >
                   <div className="flex flex-col md:flex-col gap-6">
                     <img
@@ -343,32 +344,32 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                         <h1 className="text-2xl font-bold">
                           {characterData.name.full}
                         </h1>
-                        <p className="text-zinc-400">
+                        <p className="text-muted-foreground">
                           {characterData.name.native}
                         </p>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
-                        <div className="flex items-center gap-2 bg-pink-500/20 p-4 rounded-xl">
-                          <FaHeart className="text-pink-500 text-xl" />
-                          <span className="text-pink-200 font-medium">
+                        <div className="flex items-center gap-2 bg-primary/20 p-4 rounded-xl">
+                          <FaHeart className="text-primary text-xl" />
+                          <span className="text-primary-foreground font-medium">
                             {characterData.favourites.toLocaleString()}{" "}
                             Favorites
                           </span>
                         </div>
 
                         <Link to={`/voiceactor/${characterData.id}`}>
-                          <div className="flex items-center gap-2 bg-purple-500/20 p-4 rounded-xl cursor-pointer hover:bg-purple-500/30 transition-all duration-300">
-                            <FaMicrophone className="text-purple-500 text-xl" />
-                            <span className="text-purple-200 font-medium">
+                          <div className="flex items-center gap-2 bg-secondary/20 p-4 rounded-xl cursor-pointer hover:bg-secondary/30 transition-all duration-300">
+                            <FaMicrophone className="text-secondary-foreground text-xl" />
+                            <span className="text-secondary-foreground font-medium">
                               Voice Actors
                             </span>
                           </div>
                         </Link>
 
                         {characterData.gender && (
-                          <div className="flex items-center gap-2 bg-zinc-700/30 p-4 rounded-xl">
-                            <FaUser className="text-zinc-400 text-xl" />
+                          <div className="flex items-center gap-2 bg-muted/30 p-4 rounded-xl">
+                            <FaUser className="text-muted-foreground text-xl" />
                             <span className="font-medium">
                               {characterData.gender}
                             </span>
@@ -376,8 +377,8 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                         )}
 
                         {characterData.age && (
-                          <div className="flex items-center gap-2 bg-zinc-700/30 p-4 rounded-xl">
-                            <FaClock className="text-zinc-400 text-xl" />
+                          <div className="flex items-center gap-2 bg-muted/30 p-4 rounded-xl">
+                            <FaClock className="text-muted-foreground text-xl" />
                             <span className="font-medium">
                               {characterData.age}
                             </span>
@@ -385,8 +386,8 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                         )}
 
                         {characterData.dateOfBirth.month && (
-                          <div className="flex items-center gap-2 bg-zinc-700/30 p-4 rounded-xl">
-                            <FaCakeCandles className="text-zinc-400 text-xl" />
+                          <div className="flex items-center gap-2 bg-muted/30 p-4 rounded-xl">
+                            <FaCakeCandles className="text-muted-foreground text-xl" />
                             <span className="font-medium">
                               {new Intl.DateTimeFormat("en-US", {
                                 day: "2-digit",
@@ -412,14 +413,14 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className="bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
+                  className="bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-border"
                 >
                   <h2 className="text-2xl font-semibold mb-4">About</h2>
                   <div className="relative">
                     <div
-                      className={`text-zinc-300 leading-relaxed prose prose-invert max-w-none rounded-b-xl ${
+                      className={`text-muted-foreground leading-relaxed prose prose-invert max-w-none rounded-b-xl ${
                         !isExpanded &&
-                        "max-h-[400px] overflow-hidden relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-24 after:bg-gradient-to-t after:from-zinc-800 after:to-transparent"
+                        "max-h-[400px] overflow-hidden relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-24 after:bg-gradient-to-t after:from-card after:to-transparent"
                       }`}
                       dangerouslySetInnerHTML={{
                         __html:
@@ -436,7 +437,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                         >
                           <button
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="mt-2 px-6 py-2 text-sm text-white hover:text-zinc-100 transition-all duration-200 mx-auto bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold cursor-pointer inline-flex gap-1 items-center shadow-lg hover:shadow-indigo-500/30"
+                            className="mt-2 px-6 py-2 text-sm text-primary-foreground hover:text-primary-foreground/90 transition-all duration-200 mx-auto bg-primary hover:bg-primary/90 rounded-lg font-semibold cursor-pointer inline-flex gap-1 items-center shadow-lg hover:shadow-primary/30"
                           >
                             {isExpanded ? "Read Less" : "Read More"}
                             {isExpanded ? <FaCaretUp /> : <FaCaretDown />}
@@ -449,14 +450,14 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  className="mt-8 bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
+                  className="mt-8 bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-border"
                 >
                   <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
                   <div className="relative">
                     <div
                       className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ${
                         !isGalleryExpanded &&
-                        "max-h-[600px] overflow-hidden relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-24 after:bg-gradient-to-t after:from-zinc-800 after:to-transparent"
+                        "max-h-[600px] overflow-hidden relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-24 after:bg-gradient-to-t after:from-card after:to-transparent"
                       }`}
                     >
                       {galleryImages.map((image, index) => (
@@ -480,7 +481,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                           onClick={() =>
                             setIsGalleryExpanded(!isGalleryExpanded)
                           }
-                          className="mt-2 px-6 py-2 text-sm text-white hover:text-zinc-100 transition-all duration-200 mx-auto bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold cursor-pointer inline-flex gap-1 items-center shadow-lg hover:shadow-indigo-500/30"
+                          className="mt-2 px-6 py-2 text-sm text-primary-foreground hover:text-primary-foreground/90 transition-all duration-200 mx-auto bg-primary hover:bg-primary/90 rounded-lg font-semibold cursor-pointer inline-flex gap-1 items-center shadow-lg hover:shadow-primary/30"
                         >
                           {isGalleryExpanded ? "Show Less" : "Show More"}
                           {isGalleryExpanded ? <FaCaretUp /> : <FaCaretDown />}
@@ -496,7 +497,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="mt-8 bg-zinc-800/40 backdrop-blur-xl rounded-2xl p-8 border border-zinc-700/50"
+              className="mt-8 bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-border"
             >
               <h2 className="text-2xl font-semibold mb-6">Appearances</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -504,7 +505,7 @@ export default function CharacterDetails({ params }: Route.ComponentProps) {
                   <Link
                     to={`/anime/${media.idMal}`}
                     key={media.idMal}
-                    className="block bg-zinc-700/30 rounded-xl overflow-hidden hover:bg-zinc-700/50 transition-all duration-300"
+                    className="block bg-secondary/30 rounded-xl overflow-hidden hover:bg-secondary/50 transition-all duration-300"
                   >
                     <div className="flex items-center gap-4 p-4">
                       <img

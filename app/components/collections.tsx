@@ -88,7 +88,7 @@ const Collections: React.FC = () => {
 
   return (
     <div className="my-8">
-      <h2 className="text-2xl font-bold mb-4 text-white">
+      <h2 className="text-2xl font-bold mb-4 ">
         For You
       </h2>
       <div
