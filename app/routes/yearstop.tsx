@@ -100,29 +100,29 @@ export default function YearsTop() {
   }
 
   if (loading) return <Loading />
-  if (error) return <div>{error}</div>
+  if (error) return <div className="text-destructive">{error}</div>
 
   return (
     <>
     <title>Animadom | Years & Seasons</title>
-    <div className="min-h-screen mt-3">
+    <div className="min-h-screen mt-3 theme-transition">
       <div className="container mx-auto px-6">
-        <h1 className="text-3xl font-bold mb-6 ">Top Anime by Year & Season</h1>
+        <h1 className="text-3xl font-bold mb-6">Top Anime by Year & Season</h1>
         
         {/* Year and Season Selection */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-zinc-900/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-zinc-800/50">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-card/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-border">
           {/* Year Combo Box */}
           <div className="w-full sm:w-1/3">
             <Select
               value={activeYear.toString()}
               onValueChange={(value) => setActiveYear(parseInt(value))}
             >
-              <SelectTrigger className="w-full bg-zinc-800/50 border-zinc-700">
+              <SelectTrigger className="w-full bg-secondary/50 border-border">
                 <SelectValue placeholder="Select Year" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-800 border-zinc-700 max-h-[200px] overflow-y-auto">
+              <SelectContent className="bg-popover border-border max-h-[200px] overflow-y-auto">
                 {years.map((year) => (
-                  <SelectItem key={year} value={year.toString()} className="text-zinc-200 hover:bg-zinc-700">
+                  <SelectItem key={year} value={year.toString()} className="text-popover-foreground hover:bg-secondary/50">
                     {year}
                   </SelectItem>
                 ))}
@@ -140,8 +140,8 @@ export default function YearsTop() {
                   relative group flex items-center justify-center gap-2
                   ${
                     activeSeason === season
-                      ? "bg-yellow-500/10 text-yellow-500 ring-1 ring-yellow-500/20"
-                      : "bg-zinc-800/30 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                      ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                      : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                   }
                 `}
               >
@@ -149,7 +149,7 @@ export default function YearsTop() {
                 {activeSeason === season && (
                   <motion.div
                     layoutId="activeSeasonTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                     transition={{
                       type: "spring",
                       stiffness: 500,
@@ -179,7 +179,7 @@ export default function YearsTop() {
               />
             ))
           ) : (
-            <div className="text-center py-10 text-gray-400">
+            <div className="text-center py-10 text-muted-foreground">
               No anime found for {activeSeason.toLowerCase()} {activeYear}
             </div>
           )}
@@ -214,7 +214,7 @@ export default function YearsTop() {
 
               if (index === currentPage - 3 || index === currentPage + 3) {
                 return (
-                  <span key={index} className="text-white">
+                  <span key={index} className="text-muted-foreground">
                     ...
                   </span>
                 )

@@ -3,8 +3,9 @@ import CollectionCard from "../components/collectioncard";
 import Loading from "~/components/loader";
 import { Button } from "~/components/ui/button";
 
-const ANILIST_API = "https://graphql.anilist.co";
-const GENRES_PER_PAGE = 20; // Number of genres to show per page
+const JIKAN_API = "https://api.jikan.moe/v4";
+const KITSU_API = "https://kitsu.io/api/edge";
+const GENRES_PER_PAGE = 20;
 
 export default function Collections() {
   const [collections, setCollections] = useState<
@@ -28,76 +29,43 @@ export default function Collections() {
     const fetchAnimeCollections = async () => {
       setLoading(true);
       try {
-        // First fetch the total count of genres to calculate pages
-        const countQuery = `
-          query {
-            GenreCollection
-          }
-        `;
+        // Fetch genres from Jikan
+        const genresResponse = await fetch(`${JIKAN_API}/genres/anime`);
+        if (!genresResponse.ok) throw new Error("Failed to fetch genres");
+        const genresData = await genresResponse.json();
+        const allGenres = genresData.data.map((genre: any) => genre.name);
+        
+        setTotalPages(Math.ceil(allGenres.length / GENRES_PER_PAGE));
 
-        const countResponse = await fetch(ANILIST_API, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ query: countQuery }),
-        });
-
-        if (!countResponse.ok) throw new Error("Failed to fetch genre count");
-        const countData = await countResponse.json();
-        const totalGenres = countData.data.GenreCollection.length;
-        setTotalPages(Math.ceil(totalGenres / GENRES_PER_PAGE));
-
-        // Get the genres for the current page
+        // Get genres for current page
         const startIdx = (currentPage - 1) * GENRES_PER_PAGE;
         const endIdx = startIdx + GENRES_PER_PAGE;
-        const currentGenres = countData.data.GenreCollection.slice(startIdx, endIdx);
+        const currentGenres = allGenres.slice(startIdx, endIdx);
 
-        // For each genre, fetch popular anime
+        // Fetch anime for each genre from Kitsu
         const collectionsData = await Promise.all(
           currentGenres.map(async (genre: string) => {
-            const animeQuery = `
-              query ($genre: String, $perPage: Int) {
-                Page(perPage: $perPage) {
-                  media(type: ANIME, genre: $genre, sort: POPULARITY_DESC) {
-                    coverImage {
-                      medium
-                    }
-                    title {
-                      romaji
-                    }
-                  }
-                }
-              }
-            `;
-
-            const animeResponse = await fetch(ANILIST_API, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-              body: JSON.stringify({
-                query: animeQuery,
-                variables: {
-                  genre: genre,
-                  perPage: 4, // Get 4 anime per genre for the collection card
+            const kitsuResponse = await fetch(
+              `${KITSU_API}/anime?filter[genres]=${genre}&page[limit]=4&sort=-averageRating`,
+              {
+                headers: {
+                  Accept: "application/vnd.api+json",
+                  "Content-Type": "application/vnd.api+json",
                 },
-              }),
-            });
+              }
+            );
 
-            if (!animeResponse.ok) throw new Error("Failed to fetch anime");
-            const animeData = await animeResponse.json();
+            if (!kitsuResponse.ok) throw new Error("Failed to fetch anime");
+            const kitsuData = await kitsuResponse.json();
 
-            const validAnime = animeData.data.Page.media
-              .filter((anime: any) => anime.coverImage?.medium)
+            const validAnime = kitsuData.data
+              .filter((anime: any) => anime.attributes.posterImage?.medium)
               .slice(0, 4);
 
             return {
               title: genre,
               slug: genre.toLowerCase().replace(/\s+/g, "-"),
-              images: validAnime.map((anime: any) => anime.coverImage.medium),
+              images: validAnime.map((anime: any) => anime.attributes.posterImage.medium),
             };
           })
         );

@@ -50,7 +50,7 @@ export default function About() {
           <h2 className="text-4xl font-bold mb-6 text-primary bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             APIs and Data Sources
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center space-x-4 bg-card p-6 rounded-xl shadow-md border border-muted-foreground/20">
               <div className="text-4xl font-mono font-bold text-primary bg-primary/10 p-3 rounded-lg">
                 J
@@ -83,6 +83,24 @@ export default function About() {
                 </a>
                 <p className="text-muted-foreground mt-1 text-sm">
                   GraphQL API for anime and manga data with rich features.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 bg-card p-6 rounded-xl shadow-md border border-muted-foreground/20">
+              <div className="text-4xl font-mono font-bold text-primary bg-primary/10 p-3 rounded-lg">
+                K
+              </div>
+              <div>
+                <a
+                  href="https://kitsu.docs.apiary.io/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-medium text-primary hover:underline flex items-center gap-1"
+                >
+                  Kitsu API <LuExternalLink className="text-sm" />
+                </a>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Modern JSON API for anime and manga data with extensive features.
                 </p>
               </div>
             </div>

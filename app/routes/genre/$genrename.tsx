@@ -1,22 +1,71 @@
+import { ChevronDown, FilterIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import AnimeCard from "~/components/animecard";
 import Loader from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 
 interface AnimeData {
-  mal_id: number;
-  title: string;
-  images: {
-    jpg: {
-      large_image_url: string;
-    };
+  id: number;
+  title: {
+    romaji: string;
+    english: string | null;
+    native: string;
   };
-  year: number;
-  genres?: string[];
-  averageScore?: number;
-  popularity?: number;
+  coverImage: {
+    large: string;
+    color: string | null;
+  };
+  seasonYear: number | null;
+  genres: string[];
+  averageScore: number | null;
+  popularity: number | null;
+  format: "TV" | "TV_SHORT" | "MOVIE" | "SPECIAL" | "OVA" | "ONA" | "MUSIC";
 }
+
+type SortOption =
+  | "POPULARITY_DESC"
+  | "POPULARITY"
+  | "SCORE_DESC"
+  | "SCORE"
+  | "TRENDING_DESC"
+  | "TRENDING"
+  | "UPDATED_AT_DESC"
+  | "UPDATED_AT"
+  | "START_DATE_DESC"
+  | "START_DATE"
+  | "END_DATE_DESC"
+  | "END_DATE"
+  | "FAVOURITES_DESC"
+  | "FAVOURITES"
+  | "TITLE_ROMAJI_DESC"
+  | "TITLE_ROMAJI"
+  | "TITLE_ENGLISH_DESC"
+  | "TITLE_ENGLISH"
+  | "TITLE_NATIVE_DESC"
+  | "TITLE_NATIVE"
+  | "EPISODES_DESC"
+  | "EPISODES"
+  | "ID"
+  | "ID_DESC";
+
+type FormatOption =
+  | "TV"
+  | "TV_SHORT"
+  | "MOVIE"
+  | "SPECIAL"
+  | "OVA"
+  | "ONA"
+  | "MUSIC"
+  | null;
 
 export default function GenrePage() {
   const { genrename } = useParams();
@@ -25,74 +74,55 @@ export default function GenrePage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 20;
+  const [sortBy, setSortBy] = useState<SortOption>("POPULARITY_DESC");
+  const [formatFilter, setFormatFilter] = useState<FormatOption>(null);
 
   useEffect(() => {
-    const ANILIST_GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-
     const fetchAnime = async () => {
       setLoading(true);
       setError(null);
 
-      const query = `
-        query ($term: String) {
-          byGenre: Page(page: ${currentPage}, perPage: ${itemsPerPage}) {
-            pageInfo {
-              total
-              perPage
-              currentPage
-              lastPage
-              hasNextPage
-            }
-            media(genre: $term, type: ANIME, sort: POPULARITY_DESC) {
-              idMal
-              title {
-                romaji
-                english
-                native
-              }
-              coverImage {
-                large
-              }
-              startDate {
-                year
-              }
-              genres
-              averageScore
-              popularity
-            }
-          }
-          byTag: Page(page: ${currentPage}, perPage: ${itemsPerPage}) {
-            pageInfo {
-              total
-              perPage
-              currentPage
-              lastPage
-              hasNextPage
-            }
-            media(tag: $term, type: ANIME, sort: POPULARITY_DESC) {
-              idMal
-              title {
-                romaji
-                english
-                native
-              }
-              coverImage {
-                large
-              }
-              startDate {
-                year
-              }
-              genres
-              averageScore
-              popularity
-            }
-          }
-        }
-      `;
-
       try {
-        const response = await fetch(ANILIST_GRAPHQL_ENDPOINT, {
+        const query = `
+          query ($genre: String, $page: Int, $perPage: Int, $sort: [MediaSort], $format: MediaFormat) {
+            Page(page: $page, perPage: $perPage) {
+              pageInfo {
+                total
+                perPage
+                currentPage
+                lastPage
+                hasNextPage
+              }
+              media(genre: $genre, sort: $sort, type: ANIME, format: $format) {
+                id
+                title {
+                  romaji
+                  english
+                  native
+                }
+                coverImage {
+                  large
+                  color
+                }
+                seasonYear
+                genres
+                averageScore
+                popularity
+                format
+              }
+            }
+          }
+        `;
+
+        const variables = {
+          genre: genrename,
+          page: currentPage,
+          perPage: 24,
+          sort: [sortBy],
+          format: formatFilter,
+        };
+
+        const response = await fetch("https://graphql.anilist.co", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -100,9 +130,7 @@ export default function GenrePage() {
           },
           body: JSON.stringify({
             query,
-            variables: {
-              term: genrename,
-            },
+            variables,
           }),
         });
 
@@ -110,52 +138,14 @@ export default function GenrePage() {
           throw new Error(`Network response was not ok: ${response.status}`);
         }
 
-        const { data, errors } = await response.json();
+        const { data } = await response.json();
 
-        if (errors) {
-          throw new Error(errors[0]?.message || "Error fetching anime data");
-        }
-
-        if (!data) {
+        if (!data || !data.Page) {
           throw new Error("Invalid data structure received");
         }
 
-        // Process both genre and tag results
-        const genreResults = data.byGenre?.media || [];
-        const tagResults = data.byTag?.media || [];
-
-        // Combine and deduplicate results (using idMal as unique identifier)
-        const combinedResults = [...genreResults];
-
-        // Add tag results that aren't already in genre results
-        tagResults.forEach((tagAnime) => {
-          if (
-            !combinedResults.some(
-              (genreAnime) => genreAnime.idMal === tagAnime.idMal
-            )
-          ) {
-            combinedResults.push(tagAnime);
-          }
-        });
-
-        // Format the combined results
-        const formattedAnime = combinedResults.map((anime: any) => ({
-          mal_id: anime.idMal,
-          title:
-            anime.title.english || anime.title.romaji || anime.title.native,
-          images: { jpg: { large_image_url: anime.coverImage.large } },
-          year: anime.startDate?.year,
-          genres: anime.genres,
-          averageScore: anime.averageScore,
-          popularity: anime.popularity,
-        }));
-
-        setAnimeList(formattedAnime);
-
-        // Use the larger of the two lastPage values for pagination
-        const genreLastPage = data.byGenre?.pageInfo?.lastPage || 1;
-        const tagLastPage = data.byTag?.pageInfo?.lastPage || 1;
-        setTotalPages(Math.max(genreLastPage, tagLastPage));
+        setAnimeList(data.Page.media);
+        setTotalPages(data.Page.pageInfo.lastPage);
       } catch (error) {
         console.error("Error fetching anime:", error);
         setError(
@@ -167,19 +157,17 @@ export default function GenrePage() {
     };
 
     fetchAnime();
-  }, [genrename, currentPage]);
+  }, [genrename, currentPage, sortBy, formatFilter]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     window.scrollTo(0, 0);
   };
 
-  // Improved pagination rendering logic
   const renderPaginationButtons = () => {
     const buttons = [];
     const maxButtonsToShow = 5;
 
-    // Always show first page
     buttons.push(
       <Button
         key={1}
@@ -190,7 +178,6 @@ export default function GenrePage() {
       </Button>
     );
 
-    // Calculate range of pages to show
     let startPage = Math.max(2, currentPage - Math.floor(maxButtonsToShow / 2));
     let endPage = Math.min(totalPages - 1, startPage + maxButtonsToShow - 3);
 
@@ -198,7 +185,6 @@ export default function GenrePage() {
       startPage = Math.max(2, endPage - (maxButtonsToShow - 3) + 1);
     }
 
-    // Add ellipsis after first page if needed
     if (startPage > 2) {
       buttons.push(
         <span key="ellipsis1" className="text-white px-2">
@@ -207,7 +193,6 @@ export default function GenrePage() {
       );
     }
 
-    // Add middle pages
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <Button
@@ -220,7 +205,6 @@ export default function GenrePage() {
       );
     }
 
-    // Add ellipsis before last page if needed
     if (endPage < totalPages - 1) {
       buttons.push(
         <span key="ellipsis2" className="text-white px-2">
@@ -229,7 +213,6 @@ export default function GenrePage() {
       );
     }
 
-    // Always show last page if there is more than one page
     if (totalPages > 1) {
       buttons.push(
         <Button
@@ -245,16 +228,92 @@ export default function GenrePage() {
     return buttons;
   };
 
+  const getDisplayTitle = (anime: AnimeData) => {
+    return anime.title.english || anime.title.romaji || anime.title.native;
+  };
+
   if (loading) return <Loader />;
 
   return (
     <>
-      <title>{`Animadom | ${genrename} Anime`}</title>
+      <title>{`Animadom | ${(genrename)?.charAt(0).toUpperCase()}${(genrename)?.slice(1)} Anime`}</title>
 
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 capitalize">
-          {genrename} Anime
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold capitalize">{genrename} Anime</h1>
+
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <FilterIcon className="h-4 w-4" />
+                  Sort By
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Sort Options</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setSortBy("POPULARITY_DESC")}>
+                  Popularity (High to Low)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("POPULARITY")}>
+                  Popularity (Low to High)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("SCORE_DESC")}>
+                  Score (High to Low)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("SCORE")}>
+                  Score (Low to High)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("TRENDING_DESC")}>
+                  Trending (High to Low)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("TITLE_ROMAJI")}>
+                  Title (A-Z)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setSortBy("TITLE_ROMAJI_DESC")}
+                >
+                  Title (Z-A)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Filter Format
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Anime Format</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setFormatFilter(null)}>
+                  All Formats
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFormatFilter("TV")}>
+                  TV Series
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFormatFilter("MOVIE")}>
+                  Movies
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFormatFilter("OVA")}>
+                  OVA
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFormatFilter("ONA")}>
+                  ONA
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFormatFilter("SPECIAL")}>
+                  Specials
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFormatFilter("TV_SHORT")}>
+                  TV Shorts
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
 
         {error && (
           <div className="bg-red-500 text-white p-4 rounded-md mb-6">
@@ -273,16 +332,15 @@ export default function GenrePage() {
           <div className="flex flex-wrap justify-center gap-5">
             {animeList.map((anime) => (
               <AnimeCard
-                key={anime.mal_id}
-                imageUrl={anime.images.jpg.large_image_url}
-                title={anime.title}
-                hreflink={`/anime/${anime.mal_id}`}
+                key={anime.id}
+                imageUrl={anime.coverImage.large}
+                title={getDisplayTitle(anime)}
+                hreflink={`/anime/${anime.id}`}
               />
             ))}
           </div>
         )}
 
-        {/* Pagination Controls */}
         {animeList.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-2 overflow-x-auto py-2 max-w-[85vw]">

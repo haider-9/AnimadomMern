@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -16,39 +15,118 @@ body {
   }
 }
 
+/* Enhanced Dark theme (default) */
 :root {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Base colors - deeper blacks with subtle blue undertone */
+  --background: oklch(0.12 0.02 260);
+  --foreground: oklch(0.98 0.01 90);
+  
+  /* Card/Surface colors - layered depth */
+  --card: oklch(0.15 0.02 260);
+  --card-foreground: oklch(0.98 0.01 90);
+  
+  /* Popover colors */
+  --popover: oklch(0.18 0.02 260);
+  --popover-foreground: oklch(0.98 0.01 90);
+  
+  /* Primary accent colors - vibrant but not overwhelming */
+  --primary: oklch(0.65 0.25 275); /* Soft electric purple */
+  --primary-foreground: oklch(0.98 0.01 90);
+  
+  /* Secondary colors */
+  --secondary: oklch(0.22 0.02 260);
+  --secondary-foreground: oklch(0.98 0.01 90);
+  
+  /* Muted colors */
+  --muted: oklch(0.20 0.02 260);
+  --muted-foreground: oklch(0.65 0.05 260);
+  
+  /* Accent colors - complementary to primary */
+  --accent: oklch(0.68 0.22 310); /* Soft magenta */
+  --accent-foreground: oklch(0.98 0.01 90);
+  
+  /* Destructive colors */
+  --destructive: oklch(0.7 0.25 25); /* Warm red */
+  --destructive-foreground: oklch(0.98 0.01 90);
+  
+  /* UI element colors */
+  --border: oklch(0.25 0.03 260);
+  --input: oklch(0.25 0.03 260);
+  --ring: oklch(0.65 0.25 275); /* Matches primary */
+  
+  /* Chart colors - harmonious palette */
+  --chart-1: oklch(0.65 0.25 275); /* Primary purple */
+  --chart-2: oklch(0.72 0.18 170);  /* Teal */
+  --chart-3: oklch(0.78 0.20 60);   /* Golden yellow */
+  --chart-4: oklch(0.68 0.22 310);  /* Magenta */
+  --chart-5: oklch(0.7 0.25 25);    /* Red */
+  
+  /* Sidebar colors - slightly darker than background */
+  --sidebar: oklch(0.10 0.02 260);
+  --sidebar-foreground: oklch(0.98 0.01 90);
+  --sidebar-primary: oklch(0.65 0.25 275); /* Primary purple */
+  --sidebar-primary-foreground: oklch(0.98 0.01 90);
+  --sidebar-accent: oklch(0.68 0.22 310); /* Magenta */
+  --sidebar-accent-foreground: oklch(0.98 0.01 90);
+  --sidebar-border: oklch(0.18 0.02 260);
+  --sidebar-ring: oklch(0.65 0.25 275); /* Primary purple */
+}
+
+/* Enhanced Light theme - airy and fresh */
+:root.light {
+  /* Base colors - clean white with subtle warmth */
+  --background: oklch(0.99 0.01 90);
+  --foreground: oklch(0.18 0.05 260); /* Deep blue-gray */
+  
+  /* Card/Surface colors - subtle shadows */
+  --card: oklch(0.98 0.01 90);
+  --card-foreground: oklch(0.18 0.05 260);
+  
+  /* Popover colors */
+  --popover: oklch(0.97 0.01 90);
+  --popover-foreground: oklch(0.18 0.05 260);
+  
+  /* Primary accent colors - vibrant but not harsh */
+  --primary: oklch(0.55 0.23 270); /* Royal purple */
+  --primary-foreground: oklch(0.99 0.01 90);
+  
+  /* Secondary colors - soft grays */
+  --secondary: oklch(0.92 0.02 90);
+  --secondary-foreground: oklch(0.18 0.05 260);
+  
+  /* Muted colors - very subtle grays */
+  --muted: oklch(0.95 0.01 90);
+  --muted-foreground: oklch(0.45 0.05 260);
+  
+  /* Accent colors - complementary to primary */
+  --accent: oklch(0.6 0.2 320); /* Soft pink */
+  --accent-foreground: oklch(0.99 0.01 90);
+  
+  /* Destructive colors - softer red */
+  --destructive: oklch(0.65 0.23 20); /* Coral red */
+  --destructive-foreground: oklch(0.99 0.01 90);
+  
+  /* UI element colors - very subtle borders */
+  --border: oklch(0.85 0.03 90);
+  --input: oklch(0.85 0.03 90);
+  --ring: oklch(0.55 0.23 270); /* Matches primary */
+  
+  /* Chart colors - slightly muted but vibrant */
+  --chart-1: oklch(0.55 0.23 270); /* Primary purple */
+  --chart-2: oklch(0.65 0.17 170);  /* Teal */
+  --chart-3: oklch(0.75 0.18 60);   /* Golden yellow */
+  --chart-4: oklch(0.6 0.2 320);   /* Pink */
+  --chart-5: oklch(0.65 0.23 20);   /* Coral red */
+  
+  /* Sidebar colors - very light gray */
+  --sidebar: oklch(0.96 0.01 90);
+  --sidebar-foreground: oklch(0.18 0.05 260);
+  --sidebar-primary: oklch(0.55 0.23 270); /* Primary purple */
+  --sidebar-primary-foreground: oklch(0.99 0.01 90);
+  --sidebar-accent: oklch(0.6 0.2 320); /* Pink */
+  --sidebar-accent-foreground: oklch(0.99 0.01 90);
+  --sidebar-border: oklch(0.88 0.02 90);
+  --sidebar-ring: oklch(0.55 0.23 270); /* Primary purple */
 }
 
 @theme inline {
@@ -89,17 +167,32 @@ body {
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    scroll-behavior: smooth
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 @layer utilities {
   .container {
     @apply max-w-[1480px] w-full px-4 mx-auto sm:px-6 lg:px-8;
+  }
+  
+  /* Enhanced theme transition */
+  .theme-transition {
+    transition-property: color, background-color, border-color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Better text rendering */
+  .text-optimize {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
@@ -108,12 +201,10 @@ body {
     transform: translateY(0px);
     opacity: 0;
   }
-
   50% {
     transform: translateY(-20px);
     opacity: 1;
   }
-
   100% {
     transform: translateY(-40px);
     opacity: 0;

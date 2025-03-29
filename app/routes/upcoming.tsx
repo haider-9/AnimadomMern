@@ -2,19 +2,48 @@ import AnimeCard from "../components/animecard";
 import { useEffect, useState } from "react";
 import Loading from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "~/components/ui/dropdown-menu";
+import { ChevronDownIcon, FilterIcon } from "lucide-react";
 
 export default function TrendingAnime() {
   interface Anime {
     id: number;
     title: {
       romaji: string;
+      english: string;
     };
     coverImage: {
       large: string;
     };
     idMal?: number;
     averageScore: number;
+    format: string;
   }
+
+  // Sort and filter options
+  type SortOption =
+    | "POPULARITY_DESC"
+    | "SCORE_DESC"
+    | "START_DATE_DESC"
+    | "TITLE_ROMAJI";
+  type FormatOption =
+    | "TV"
+    | "MOVIE"
+    | "OVA"
+    | "ONA"
+    | "SPECIAL"
+    | "MUSIC"
+    | null;
 
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,9 +51,18 @@ export default function TrendingAnime() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
 
+  // Filter states
+  const [sortBy, setSortBy] = useState<SortOption>("POPULARITY_DESC");
+  const [format, setFormat] = useState<FormatOption>(null);
+
+  useEffect(() => {
+    handlePageChange(1);
+  }, [sortBy, format]);
+
   useEffect(() => {
     handlePageChange(currentPage);
-  }, [currentPage]);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -35,8 +73,11 @@ export default function TrendingAnime() {
     scrollToTop();
 
     try {
+      // Build format filter condition
+      const formatFilter = format ? `, format: ${format}` : "";
+
       const query = `
-          query ($page: Int) {
+          query ($page: Int, $sort: [MediaSort]) {
             Page(page: $page, perPage: 20) {
               pageInfo {
                 hasNextPage
@@ -44,7 +85,7 @@ export default function TrendingAnime() {
                 currentPage
                 lastPage
               }
-              media(type: ANIME, status: NOT_YET_RELEASED, sort: POPULARITY_DESC) {
+              media(type: ANIME, status: NOT_YET_RELEASED, sort: $sort${formatFilter}) {
                 title {
                   romaji
                   english
@@ -54,6 +95,7 @@ export default function TrendingAnime() {
                 }
                 idMal
                 averageScore
+                format
               }
             }
           }
@@ -66,7 +108,10 @@ export default function TrendingAnime() {
         },
         body: JSON.stringify({
           query,
-          variables: { page: newPage },
+          variables: {
+            page: newPage,
+            sort: [sortBy],
+          },
         }),
       });
 
@@ -79,6 +124,35 @@ export default function TrendingAnime() {
       setIsLoading(false);
     }
   };
+
+  const handleSortChange = (value: SortOption) => {
+    setSortBy(value);
+  };
+
+  const handleFormatChange = (value: FormatOption) => {
+    setFormat(value);
+  };
+
+  const getSortLabel = (sort: SortOption) => {
+    switch (sort) {
+      case "POPULARITY_DESC":
+        return "Popularity";
+      case "SCORE_DESC":
+        return "Score";
+      case "START_DATE_DESC":
+        return "Release Date";
+      case "TITLE_ROMAJI":
+        return "Title";
+      default:
+        return "Popularity";
+    }
+  };
+
+  const getFormatLabel = (format: FormatOption) => {
+    if (!format) return "All Formats";
+    return format;
+  };
+
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
   }
@@ -88,67 +162,140 @@ export default function TrendingAnime() {
 
   return (
     <>
-    <title>Animadom | Upcoming Anime</title>
-    <section className="py-8">
-      <h2 className="text-2xl font-bold mb-6 px-4">UpComing Anime</h2>
-      <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
-        {trendingAnime.map((anime) => (
-          <AnimeCard
-            key={anime.idMal}
-            title={anime.title.english || anime.title.romaji}
-            imageUrl={anime.coverImage.large}
-            hreflink={`/anime/${anime.idMal}`}
-            score={anime.averageScore}
-          />
-        ))}
-      </div>
-      <div className="mt-8 flex justify-center">
-        <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-
-          {[...Array(50)].map((_, index) => {
-            if (
-              index === 0 ||
-              index === 49 ||
-              (index >= currentPage - 2 && index <= currentPage + 2)
-            ) {
-              return (
-                <Button
-                  key={index + 1}
-                  variant={currentPage === index + 1 ? "default" : "outline"}
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  {index + 1}
+      <title>Animadom | Upcoming Anime</title>
+      <section className="py-8">
+        <div className="flex justify-between items-center mb-6 px-4">
+          <h2 className="text-2xl font-bold">Upcoming Anime</h2>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-1">
+                  <FilterIcon className="h-4 w-4" />
+                  Sort: {getSortLabel(sortBy)}
+                  <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
-              );
-            }
-            // Show ellipsis for skipped pages
-            if (index === currentPage - 3 || index === currentPage + 3) {
-              return (
-                <span key={index} className="text-white">
-                  ...
-                </span>
-              );
-            }
-            return null;
-          })}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={sortBy}
+                  onValueChange={(value) =>
+                    handleSortChange(value as SortOption)
+                  }
+                >
+                  <DropdownMenuRadioItem value="POPULARITY_DESC">
+                    Popularity
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="SCORE_DESC">
+                    Score
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="START_DATE_DESC">
+                    Release Date
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="TITLE_ROMAJI">
+                    Title
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={!hasNextPage}
-          >
-            Next
-          </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-1">
+                  Format: {getFormatLabel(format)}
+                  <ChevronDownIcon className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Format</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={format || ""}
+                  onValueChange={(value) =>
+                    handleFormatChange(
+                      value === "" ? null : (value as FormatOption)
+                    )
+                  }
+                >
+                  <DropdownMenuRadioItem value="">
+                    All Formats
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="TV">TV</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="MOVIE">
+                    Movie
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="OVA">OVA</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="ONA">ONA</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="SPECIAL">
+                    Special
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="MUSIC">
+                    Music
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
-    </section>
+        <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
+          {trendingAnime.map((anime) => (
+            <AnimeCard
+              key={anime.idMal}
+              title={anime.title.english || anime.title.romaji}
+              imageUrl={anime.coverImage.large}
+              hreflink={`/anime/${anime.idMal}`}
+              score={anime.averageScore}
+            />
+          ))}
+        </div>
+        <div className="mt-8 flex justify-center">
+          <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+
+            {[...Array(50)].map((_, index) => {
+              if (
+                index === 0 ||
+                index === 49 ||
+                (index >= currentPage - 2 && index <= currentPage + 2)
+              ) {
+                return (
+                  <Button
+                    key={index + 1}
+                    variant={currentPage === index + 1 ? "default" : "outline"}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </Button>
+                );
+              }
+              // Show ellipsis for skipped pages
+              if (index === currentPage - 3 || index === currentPage + 3) {
+                return (
+                  <span key={index} className="text-white">
+                    ...
+                  </span>
+                );
+              }
+              return null;
+            })}
+
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!hasNextPage}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

@@ -200,15 +200,15 @@ export default function SearchResults() {
     { id: "genres", label: "Genres", icon: "🏷️" },
     { id: "voiceActors", label: "Voice Actors", icon: "🎤" },
   ];
-  
+
   if (loading) return <Loading />;
 
   return (
     <>
       <title>Animadom | Search Results</title>
-      <div className="min-h-screen mt-3">
+      <div className="min-h-screen mt-3 theme-transition">
         <div className="container mx-auto px-6">
-          <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-zinc-900/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-zinc-800/50">
+          <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-card/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-border">
             <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 w-full">
               {tabs.map((tab) => (
                 <Button
@@ -218,8 +218,8 @@ export default function SearchResults() {
                   relative group flex items-center justify-center gap-2
                   ${
                     activeTab === tab.id
-                      ? "bg-yellow-500/10 text-yellow-500 ring-1 ring-yellow-500/20"
-                      : "bg-zinc-800/30 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                      ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                      : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                   }
                 `}
                 >
@@ -228,7 +228,7 @@ export default function SearchResults() {
                   {activeTab === tab.id && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                       transition={{
                         type: "spring",
                         stiffness: 500,
@@ -331,7 +331,7 @@ export default function SearchResults() {
                   index === currentPage[activeTab] + 3
                 ) {
                   return (
-                    <span key={index} className="text-white">
+                    <span key={index} className="text-muted-foreground">
                       ...
                     </span>
                   );
