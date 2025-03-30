@@ -84,7 +84,7 @@ export default function TrendingAnime() {
             title={anime.title.english || anime.title.romaji}
             imageUrl={anime.coverImage.large}
             hreflink={`/anime/${anime.idMal}`}
-            score={anime.averageScore}
+            score={anime.averageScore / 10}
           />
         ))}
       </div>

@@ -46,7 +46,7 @@ export default function Header() {
   };
 
   return (
-    <div className="sticky top-0 backdrop-blur-md bg-background/80 w-full py-3 px-4 md:px-8 flex items-center justify-between z-50 border-b theme-transition">
+    <div className=" w-full py-3 px-4 md:px-8 flex items-center justify-between z-50 border-b theme-transition">
       <div className="flex items-center gap-8">
         <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <LucideTv className="h-7 w-7 text-primary" />
