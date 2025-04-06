@@ -16,9 +16,7 @@ body {
   }
 }
 
-/* Enhanced Dark theme (default) */
 :root {
-  /* Base colors - deeper blacks with subtle blue undertone */
   --background: oklch(0.12 0.02 260);
   --foreground: oklch(0.98 0.01 90);
   

@@ -4,17 +4,9 @@ import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import AuthContext from "~/context/AuthContext";
-import { LucideTv } from "lucide-react";
-import { Link } from "react-router";
+
 
 type FormState = "signup" | "signin";
-interface FormEvent {
-  target: {
-    name: string;
-    value: string;
-  };
-}
-
 const AuthForm: React.FC = () => {
   const navigate = useNavigate();
   const [formState, setFormState] = useState<FormState>("signin");
@@ -109,17 +101,7 @@ const AuthForm: React.FC = () => {
       <title>Animadom | Get Started</title>
 
       <div className="flex min-h-screen w-full items-center justify-center p-4 ">
-        {/* Logo in top left corner */}
-        <Link
-          to="/"
-          className="absolute top-6 left-6 flex items-center gap-2 z-10"
-        >
-          <LucideTv className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-semibold font-mono text-white">
-            <div className="sm:block hidden">アニマドム</div>
-            <span className="sm:hidden">Animadom</span>
-          </h1>
-        </Link>
+        
 
         <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl">
           <motion.div

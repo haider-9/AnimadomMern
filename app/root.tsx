@@ -11,10 +11,10 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import Header from "./components/header";
 import Footer from "./components/footer";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import NotFound from "./routes/NotFound";
 import { AuthProvider } from "./context/AuthContext";
-
+import BG from "./components/bg";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -40,36 +40,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <BG />
+
         <div className="container">
           <Header />
-          <div  className="mt-10">
-
-          {children}
-          </div>
+          <div className="mt-10">{children}</div>
         </div>
         <ScrollRestoration />
         <Scripts />
-        <Footer/>
+        <Footer />
       </body>
     </html>
   );
 }
-  export default function App() {
-    return (
-      <AuthProvider>
-        <>
-          <Toaster position="top-right" />
-          <Outlet />
-        </>
-      </AuthProvider>
-    );
-  }export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export default function App() {
+  return (
+    <AuthProvider>
+      <>
+        <Toaster position="top-right" />
+        <Outlet />
+      </>
+    </AuthProvider>
+  );
+}
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
-  let details = "Its a free API, it has its own limits. 💀";;
+  let details = "Its a free API, it has its own limits. 💀";
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    return <NotFound/>
+    return <NotFound />;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;
