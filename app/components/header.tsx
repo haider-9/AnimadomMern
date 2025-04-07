@@ -138,7 +138,7 @@ export default function Header() {
         </Link>
 
         <nav className="hidden lg:block">
-          <ul className="flex gap-8 text-sm font-medium">
+          <ul className="flex gap-6 text-[12px] font-medium">
             {["Home", "Upcoming", "Collections", "Top Characters", "About"].map(
               (item) => (
                 <motion.li
