@@ -5,7 +5,6 @@ import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import AuthContext from "~/context/AuthContext";
 
-
 type FormState = "signup" | "signin";
 const AuthForm: React.FC = () => {
   const navigate = useNavigate();
@@ -101,8 +100,6 @@ const AuthForm: React.FC = () => {
       <title>Animadom | Get Started</title>
 
       <div className="flex min-h-screen w-full items-center justify-center p-4 ">
-        
-
         <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl">
           <motion.div
             className="flex w-full flex-col lg:flex-row"
