@@ -1,12 +1,6 @@
 import { Button } from "./ui/button";
 import { Link } from "react-router";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import React from "react";
+
 import { LuPlay, LuPlus, LuStar } from "react-icons/lu";
 
 interface AnimeCardProps {
@@ -29,21 +23,23 @@ export default function AnimeCard({
         <img
           src={imageUrl || "https://dummyimage.com/500x500"}
           alt={title}
-          className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover object-center scale-100 group-hover:scale-[1.02] group-hover:blur-[2px] transition-all duration-700"
           loading="lazy"
         />
 
-        {/* Glassmorphic Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-[2px] group-hover:backdrop-blur-[4px] transition-all duration-300" />
+        {/* Glassmorphic Overlay - Hidden by default, visible on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/0 via-black/0 to-transparent group-hover:from-black/70 group-hover:via-black/30 transition-all duration-500" />
 
-        {/* Floating Score Badge */}
-        <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm text-yellow-400 flex items-center gap-2 shadow-lg border border-white/30">
+        {/* Floating Score Badge - Hidden by default, visible on hover */}
+        <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-sm text-yellow-400 flex items-center gap-2 shadow-lg border border-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <LuStar className="w-5 h-5 text-yellow-400 drop-shadow" />
-          <span className="font-bold text-yellow-400 tracking-wide">{score}</span>
+          <span className="font-bold text-yellow-400 tracking-wide">
+            {score}
+          </span>
         </div>
 
-        {/* Vertical Action Buttons */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+        {/* Vertical Action Buttons - Hidden by default, visible on hover */}
+        <div className="absolute top-3 right-3 flex flex-col gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
             variant="default"
             size="sm"
@@ -64,16 +60,22 @@ export default function AnimeCard({
               <LuPlus className="w-5 h-5" />
             </Button>
             <div className="absolute right-0 mt-2 z-20 min-w-[10rem] bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-zinc-200 opacity-0 group-hover/add:opacity-100 pointer-events-none group-hover/add:pointer-events-auto transition-opacity duration-200 flex flex-col overflow-hidden">
-              <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">Add to Watchlist</button>
-              <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">Add to Favorites</button>
-              <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">Add to Custom List</button>
+              <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">
+                Add to Watchlist
+              </button>
+              <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">
+                Add to Favorites
+              </button>
+              <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">
+                Add to Custom List
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Title at Bottom with Glass Effect */}
-        <div className="absolute bottom-0 left-0 w-full px-4 py-3 bg-white/20 backdrop-blur-md rounded-t-xl flex flex-col items-start">
-          <h3 className="text-white font-extrabold text-lg drop-shadow mb-1 line-clamp-2 w-full">
+        {/* Title at Bottom with Glass Effect - Hidden by default, visible on hover */}
+        <div className="absolute bottom-0 left-0 w-full px-5 py-4 bg-black/40 backdrop-blur-lg flex flex-col items-start opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+          <h3 className="text-white font-bold text-base sm:text-lg drop-shadow-lg line-clamp-2 w-full leading-tight">
             {title}
           </h3>
         </div>
