@@ -42,8 +42,7 @@ export default function CharacterCard({
 
   return (
     <Card className="relative w-full p-0 h-80 overflow-hidden group transition-all duration-500  hover:shadow-2xl hover:shadow-secondary/20 border-0 bg-gradient-to-br from-card/60 to-card/90 backdrop-blur-sm">
-      <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
+     
       <img
         src={imageUrl || "https://dummyimage.com/400x400"}
         alt={name}
