@@ -5,6 +5,23 @@ import AnimeCard from "~/components/animecard";
 import CharacterCard from "~/components/charactercard";
 import { Button } from "~/components/ui/button";
 import Loading from "~/components/loader";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/$query";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({ params }: Route.MetaArgs) {
+  const query = params.query || "";
+  const decodedQuery = decodeURIComponent(query);
+  
+  return generateMeta({
+    title: `Search Results for "${decodedQuery}"`,
+    description: `Search results for "${decodedQuery}". Find anime, characters, genres, and voice actors related to your search query.`,
+    keywords: `anime search, ${decodedQuery}, anime finder, character search, anime database`,
+    url: `/search/${query}`,
+    canonical: `https://animadom.vercel.app/search/${query}`,
+    noIndex: true, // Search result pages are typically not indexed
+  });
+}
 
 interface AnimeResult {
   idMal: number;
@@ -47,8 +64,6 @@ interface SearchResults {
   voiceActors: VoiceActorResult[];
 }
 
-const ANILIST_ENDPOINT = "https://graphql.anilist.co";
-const JIKAN_ENDPOINT = "https://api.jikan.moe/v4";
 const ITEMS_PER_PAGE = 20;
 
 export default function SearchResults() {
@@ -134,7 +149,7 @@ export default function SearchResults() {
     try {
       const [animeData, charactersData, genresData, voiceActorsData] =
         await Promise.all([
-          fetch(ANILIST_ENDPOINT, {
+          fetch(API_ENDPOINTS.ANILIST, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -146,9 +161,9 @@ export default function SearchResults() {
             }),
           }).then((res) => res.json()),
           fetch(
-            `${JIKAN_ENDPOINT}/characters?q=${query}&page=${currentPage.characters}&limit=${ITEMS_PER_PAGE}&order_by=favorites&sort=desc`
+            `${API_ENDPOINTS.JIKAN}/characters?q=${query}&page=${currentPage.characters}&limit=${ITEMS_PER_PAGE}&order_by=favorites&sort=desc`
           ).then((res) => res.json()),
-          fetch(ANILIST_ENDPOINT, {
+          fetch(API_ENDPOINTS.ANILIST, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -160,7 +175,7 @@ export default function SearchResults() {
             }),
           }).then((res) => res.json()),
           fetch(
-            `${JIKAN_ENDPOINT}/people?q=${query}&page=${currentPage.voiceActors}&limit=${ITEMS_PER_PAGE}&order_by=favorites&sort=desc`
+            `${API_ENDPOINTS.JIKAN}/people?q=${query}&page=${currentPage.voiceActors}&limit=${ITEMS_PER_PAGE}&order_by=favorites&sort=desc`
           ).then((res) => res.json()),
         ]);
 
@@ -245,7 +260,7 @@ export default function SearchResults() {
             key={activeTab}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-wrap justify-center gap-4"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center"
           >
             {activeTab === "anime" &&
               results.anime.map((anime) => (

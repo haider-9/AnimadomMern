@@ -1,3 +1,16 @@
+// API Configuration
+export const API_ENDPOINTS = {
+  JIKAN: import.meta.env.VITE_JIKAN_API_URL || 'https://api.jikan.moe/v4',
+  ANILIST: import.meta.env.VITE_ANILIST_API_URL || 'https://graphql.anilist.co',
+  KITSU: import.meta.env.VITE_KITSU_API_URL || 'https://kitsu.io/api/edge',
+} as const;
+
+// App Configuration
+export const APP_CONFIG = {
+  NAME: import.meta.env.VITE_APP_NAME || 'Animadom',
+  URL: import.meta.env.VITE_APP_URL || 'https://animadom.vercel.app',
+} as const;
+
 export const topAnime = [
   {
     id: 21,

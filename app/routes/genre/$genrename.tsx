@@ -4,6 +4,9 @@ import { useParams } from "react-router";
 import AnimeCard from "~/components/animecard";
 import Loader from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/$genrename";
+import { generateMeta } from "~/lib/seo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +15,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+
+export function meta({ params }: Route.MetaArgs) {
+  const genreName = params.genrename || "";
+  const decodedGenre = decodeURIComponent(genreName).replace(/-/g, " ");
+  const capitalizedGenre = decodedGenre.charAt(0).toUpperCase() + decodedGenre.slice(1);
+  
+  return generateMeta({
+    title: `${capitalizedGenre} Anime`,
+    description: `Discover the best ${capitalizedGenre.toLowerCase()} anime series and movies. Browse through our curated collection of ${capitalizedGenre.toLowerCase()} anime with ratings and reviews.`,
+    keywords: `${capitalizedGenre.toLowerCase()} anime, anime genre, ${capitalizedGenre.toLowerCase()} series, anime by genre`,
+    url: `/genre/${genreName}`,
+    canonical: `https://animadom.vercel.app/genre/${genreName}`,
+  });
+}
 
 interface AnimeData {
   id: number;
@@ -145,7 +162,7 @@ export default function GenrePage() {
           format: formatFilter,
         };
 
-        const response = await fetch("https://graphql.anilist.co", {
+        const response = await fetch(API_ENDPOINTS.ANILIST, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -230,7 +247,7 @@ export default function GenrePage() {
 
     if (startPage > 2) {
       buttons.push(
-        <span key="ellipsis1" className="text-white px-2">
+        <span key="ellipsis1" className="text-muted-foreground px-2">
           ...
         </span>
       );
@@ -250,7 +267,7 @@ export default function GenrePage() {
 
     if (endPage < totalPages - 1) {
       buttons.push(
-        <span key="ellipsis2" className="text-white px-2">
+        <span key="ellipsis2" className="text-muted-foreground px-2">
           ...
         </span>
       );
@@ -380,7 +397,7 @@ export default function GenrePage() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-wrap justify-center gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 justify-items-center">
             {animeList.map((anime) => (
               <AnimeCard
                 key={anime.id}

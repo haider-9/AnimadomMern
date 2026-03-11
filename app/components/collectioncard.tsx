@@ -1,4 +1,6 @@
 import { Link } from "react-router";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 
 interface CollectionCardProps {
   title: string;
@@ -18,22 +20,21 @@ export default function CollectionCard({
   hreflink,
 }: CollectionCardProps) {
   return (
-    <div className="relative border w-[320px] h-[420px] cursor-pointer overflow-hidden rounded-3xl shadow-xl bg-black/30 group">
-      <div className="absolute inset-0 overflow-hidden">
+    <Card className="relative w-full h-96 overflow-hidden group cursor-pointer">
+      <div className="absolute inset-0">
         <img
           src={backgroundImage}
           alt={`${title} background`}
-          className=" blur-[1px] brightness-50 object-cover object-center size-full"
+          className="blur-sm brightness-50 object-cover size-full"
         />
       </div>
 
-      {/* Card Content */}
-      <div className="relative flex flex-col items-center justify-center h-full ">
+      <CardContent className="relative flex flex-col items-center justify-center h-full p-6">
         <div className="flex items-end space-x-[-20px] mb-4">
           {thumbnailImages.slice(0, 3).map((img, index) => (
             <div
               key={index}
-              className={`w-[90px] h-[140px] rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-out group-hover:scale-110 ${
+              className={`w-20 h-32 rounded-lg shadow-lg overflow-hidden transition-transform group-hover:scale-105 ${
                 index === 0
                   ? "rotate-[-10deg]"
                   : index === 2
@@ -44,23 +45,18 @@ export default function CollectionCard({
               <img
                 src={img}
                 alt={`${title} thumbnail ${index + 1}`}
-                className="object-cover h-full object-center"
+                className="object-cover h-full"
               />
             </div>
           ))}
         </div>
 
-        {/* Title & Item Count */}
-        <h3 className="text-lg font-semibold text-white text-center">
-          {title}
-        </h3>
+        <CardTitle className="text-center mb-4">{title}</CardTitle>
 
-        <Link to={hreflink}>
-          <button className="mt-2 px-4 py-2 bg-white/20 text-white cursor-pointer rounded-lg backdrop-blur-md hover:bg-white/30 transition">
-            View Collection
-          </button>
-        </Link>
-      </div>
-    </div>
+        <Button asChild variant="secondary" size="sm">
+          <Link to={hreflink}>View Collection</Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

@@ -4,6 +4,20 @@ import { Link, useParams } from "react-router";
 import { FaHeart, FaStar, FaBirthdayCake } from "react-icons/fa";
 import Loader from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/$id";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({ params }: Route.MetaArgs) {
+  return generateMeta({
+    title: "Voice Actor Profile",
+    description: "Discover detailed information about voice actors and their anime roles. Explore their career, popular characters, and contributions to the anime industry.",
+    keywords: "voice actor, seiyuu, anime voice actor, voice acting, anime staff",
+    url: `/people/${params.id}`,
+    type: "profile",
+    canonical: `https://animadom.vercel.app/people/${params.id}`,
+  });
+}
 
 interface PersonData {
   mal_id: number;
@@ -20,6 +34,7 @@ interface PersonData {
     };
   };
   voices: Array<{
+    anime: any;
     role: string;
     character: {
       mal_id: number;
@@ -79,7 +94,7 @@ export default function PersonDetails() {
 
       try {
         const response = await fetch(
-          `https://api.jikan.moe/v4/people/${id}/full`
+          `${API_ENDPOINTS.JIKAN}/people/${id}/full`
         );
         if (!response.ok)
           throw new Error(`API request failed with status ${response.status}`);
@@ -322,8 +337,8 @@ export default function PersonDetails() {
                               </h3>
                               {entry.anime.score && (
                                 <div className="flex items-center gap-2 mt-2">
-                                  <FaStar className="text-yellow-500" />
-                                  <span className="text-yellow-200">
+                                  <FaStar className="text-chart-3" />
+                                  <span className="text-chart-3">
                                     {entry.anime.score.toFixed(1)}
                                   </span>
                                 </div>

@@ -4,6 +4,18 @@ import { login, signup } from "~/api/user";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import AuthContext from "~/context/AuthContext";
+import type { Route } from "./+types/weeb";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Get Started - Join Animadom",
+    description: "Join the Animadom community! Create your account to track your anime, build watchlists, and connect with fellow anime enthusiasts.",
+    keywords: "anime community, join animadom, anime tracker, anime social network, anime account",
+    url: "/getstarted",
+    canonical: "https://animadom.vercel.app/getstarted",
+  });
+}
 
 type FormState = "signup" | "signin";
 const AuthForm: React.FC = () => {

@@ -1,8 +1,24 @@
 import { useParams } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CharacterCard from "~/components/charactercard";
 import { Button } from "~/components/ui/button";
 import Loading from "~/components/loader";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/$animeid";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({ params }: Route.MetaArgs) {
+  return generateMeta({
+    title: "Anime Characters",
+    description: "Explore all characters from this anime series. Discover main characters, supporting cast, and their roles in the story.",
+    keywords: "anime characters, character list, anime cast, character profiles",
+    url: `/morecharacters/${params.animeid}`,
+    canonical: `https://animadom.vercel.app/morecharacters/${params.animeid}`,
+  });
+}
 
 interface Character {
   character: {
@@ -17,33 +33,25 @@ interface Character {
   role: string;
 }
 
+const fetchAnimeCharacters = async (animeid: string) => {
+  const response = await fetch(`${API_ENDPOINTS.JIKAN}/anime/${animeid}/characters`);
+  if (!response.ok) throw new Error('Failed to fetch characters');
+  const data = await response.json();
+  return data.data;
+};
+
 export default function AnimeCharacters() {
   const { animeid } = useParams();
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const charactersPerPage = 20;
 
-  useEffect(() => {
-    const fetchCharacters = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `https://api.jikan.moe/v4/anime/${animeid}/characters`
-        );
-        const data = await response.json();
-        setCharacters(data.data);
-        setTotalPages(Math.ceil(data.data.length / charactersPerPage));
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching characters:", error);
-        setIsLoading(false);
-      }
-    };
+  const { data: characters = [], isLoading, error } = useQuery({
+    queryKey: ["anime-characters", animeid],
+    queryFn: () => fetchAnimeCharacters(animeid!),
+    enabled: !!animeid,
+  });
 
-    fetchCharacters();
-  }, [animeid]);
+  const totalPages = Math.ceil(characters.length / charactersPerPage);
 
   const paginatedCharacters = characters.slice(
     (currentPage - 1) * charactersPerPage,
@@ -56,7 +64,28 @@ export default function AnimeCharacters() {
   };
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div className="min-h-screen">
+        <div className="mb-8">
+          <Skeleton className="h-8 w-64" />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {[...Array(20)].map((_, i) => (
+            <Skeleton key={i} className="h-80 w-full" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load characters</AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (
@@ -64,8 +93,8 @@ export default function AnimeCharacters() {
       <title>{`All Character `}</title>
       <div className="min-h-screen">
         <h1 className="mb-8 text-3xl font-bold ">{`All Featured Characters`}</h1>
-        <div className="flex flex-wrap justify-center gap-4">
-          {paginatedCharacters.map((char) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {paginatedCharacters.map((char: Character) => (
             <CharacterCard
               key={char.character.mal_id}
               imageUrl={char.character.images.jpg.image_url}
@@ -105,7 +134,7 @@ export default function AnimeCharacters() {
               // Show ellipsis for skipped pages
               if (index === currentPage - 3 || index === currentPage + 3) {
                 return (
-                  <span key={index} className="text-white">
+                  <span key={index} className="text-muted-foreground">
                     ...
                   </span>
                 );

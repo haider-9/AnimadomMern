@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import AnimeCard from "../components/animecard";
 import { Button } from "~/components/ui/button";
 import Loading from "~/components/loader";
+import { API_ENDPOINTS } from "~/constants";
 
 interface Anime {
   id: number;
@@ -52,7 +53,7 @@ export default function TopRated() {
           }
         `;
 
-        const response = await fetch('https://graphql.anilist.co', {
+        const response = await fetch(API_ENDPOINTS.ANILIST, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export default function TopRated() {
       <title>Top Rated Anime</title>
       <div className="min-h-screen p-4 sm:p-8">
         <h1 className="mb-8 text-3xl font-bold">Top Rated Anime</h1>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 justify-items-center">
           {topAnime.map((anime) => (
             <AnimeCard
               key={anime.id}
@@ -127,7 +128,7 @@ export default function TopRated() {
 
               if (index === currentPage - 3 || index === currentPage + 3) {
                 return (
-                  <span key={index} className="text-white">
+                  <span key={index} className="text-muted-foreground">
                     ...
                   </span>
                 );

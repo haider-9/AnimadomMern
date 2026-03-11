@@ -1,5 +1,11 @@
 import { Button } from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { Link } from "react-router";
+import { LuEye, LuHeart, LuStar, LuTv } from "react-icons/lu";
+import { useState } from "react";
+import {EllipsisVertical} from 'lucide-react'
 
 interface CharacterCardProps {
   imageUrl: string;
@@ -7,6 +13,8 @@ interface CharacterCardProps {
   role: string;
   animeAppearances?: number;
   hreflink: string;
+  popularity?: number;
+  favorites?: number;
 }
 
 export default function CharacterCard({
@@ -15,62 +23,172 @@ export default function CharacterCard({
   role,
   animeAppearances = 0,
   hreflink,
+  popularity,
+  favorites,
 }: CharacterCardProps) {
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [showMobileActions, setShowMobileActions] = useState(false);
+
+  const getRoleColor = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'main':
+        return 'bg-primary text-primary-foreground';
+      case 'supporting':
+        return 'bg-secondary text-secondary-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
   return (
-    <div className="w-40 sm:w-56 md:w-64 h-80 sm:h-96 rounded-2xl overflow-hidden shadow-xl group bg-gradient-to-br from-zinc-900/80 to-zinc-800/60 relative flex flex-col">
-      {/* Character Image */}
+    <Card className="relative w-full p-0 h-80 overflow-hidden group transition-all duration-500  hover:shadow-2xl hover:shadow-secondary/20 border-0 bg-gradient-to-br from-card/60 to-card/90 backdrop-blur-sm">
+      <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
       <img
         src={imageUrl || "https://dummyimage.com/400x400"}
         alt={name}
-        className="w-full h-full object-cover object-center scale-100 group-hover:scale-[1.02] group-hover:blur-[2px] transition-all duration-700 absolute inset-0 z-0"
+        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
         loading="lazy"
       />
 
-      {/* Glassmorphic Overlay - Hidden by default, visible on hover */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/0 via-black/0 to-transparent group-hover:from-black/70 group-hover:via-black/30 transition-all duration-500 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-50 group-hover:opacity-90 transition-opacity duration-300" />
 
-      {/* Floating Badges - Hidden by default, visible on hover */}
-      <div className="absolute top-3 left-3 flex flex-col gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs text-primary font-bold shadow border border-white/30 tracking-wide">{role}</span>
-        <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs text-zinc-700 font-semibold shadow border border-white/30 tracking-wide">📺 {animeAppearances}</span>
+      {/* Role Badge */}
+      <Badge 
+        className={`absolute top-3 left-3 ${getRoleColor(role)} border-0 backdrop-blur-md shadow-lg transform -translate-y-2 group-hover:translate-y-0 transition-all duration-300 font-medium`}
+      >
+        {role}
+      </Badge>
+
+      {/* Mobile Actions Toggle */}
+      <Button
+        variant="secondary"
+        size="icon"
+        className="absolute top-3 right-3 md:hidden backdrop-blur-md shadow-lg h-8 w-8 rounded-full"
+        onClick={(e) => {
+          e.preventDefault();
+          setShowMobileActions(!showMobileActions);
+        }}
+      >
+        <EllipsisVertical className="w-4 h-4" />
+      </Button>
+
+      {/* Stats Badges - Desktop */}
+      <div className="absolute top-3 right-3 hidden md:flex flex-col gap-2 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+        {animeAppearances > 0 && (
+          <Badge variant="secondary" className="backdrop-blur-md shadow-lg text-xs">
+            <LuTv className="w-3 h-3 mr-1" />
+            {animeAppearances}
+          </Badge>
+        )}
+        {favorites && (
+          <Badge variant="outline" className="backdrop-blur-md shadow-lg text-xs bg-white/10 border-white/20 text-white">
+            <LuStar className="w-3 h-3 mr-1" />
+            {favorites > 1000 ? `${(favorites / 1000).toFixed(1)}k` : favorites}
+          </Badge>
+        )}
       </div>
 
-      {/* Name at Bottom with Glass Effect - Hidden by default, visible on hover */}
-      <div className="absolute bottom-0 left-0 w-full px-5 py-4 bg-black/40 backdrop-blur-lg flex flex-col items-start z-20 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
-        <h3 className="text-white font-bold text-base sm:text-lg drop-shadow-lg line-clamp-2 w-full leading-tight">
+      {/* Desktop Action Buttons (hover) */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 delay-150 max-md:hidden">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="default" size="icon" asChild className="rounded-full h-12 w-12 backdrop-blur-md shadow-xl hover:scale-110 transition-transform">
+              <Link to={hreflink}>
+                <LuEye className="w-5 h-5" />
+                <span className="sr-only">View Details</span>
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>View Character Details</p>
+          </TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              size="icon" 
+              variant={isFavorited ? "default" : "secondary"} 
+              className="rounded-full h-10 w-10 backdrop-blur-md shadow-lg hover:scale-110 transition-all"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsFavorited(!isFavorited);
+              }}
+            >
+              <LuHeart className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
+              <span className="sr-only">Add to Favorites</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Mobile Action Buttons (toggle) */}
+      {showMobileActions && (
+        <div className="absolute top-12 right-3 md:hidden flex flex-col gap-2 bg-black/80 backdrop-blur-md rounded-lg p-2 shadow-xl">
+          <Button variant="default" size="sm" asChild className="rounded-lg">
+            <Link to={hreflink}>
+              <LuEye className="w-4 h-4 mr-2" />
+              View
+            </Link>
+          </Button>
+          
+          <Button 
+            size="sm" 
+            variant={isFavorited ? "default" : "secondary"} 
+            className="rounded-lg"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsFavorited(!isFavorited);
+            }}
+          >
+            <LuHeart className={`w-4 h-4 mr-2 ${isFavorited ? 'fill-current' : ''}`} />
+            {isFavorited ? 'Liked' : 'Like'}
+          </Button>
+
+          {/* Stats in mobile menu */}
+          {(animeAppearances > 0 || favorites) && (
+            <div className="flex flex-col gap-1 pt-2 border-t border-white/20">
+              {animeAppearances > 0 && (
+                <div className="text-xs text-white/70 flex items-center">
+                  <LuTv className="w-3 h-3 mr-1" />
+                  {animeAppearances} anime{animeAppearances !== 1 ? 's' : ''}
+                </div>
+              )}
+              {favorites && (
+                <div className="text-xs text-white/70 flex items-center">
+                  <LuStar className="w-3 h-3 mr-1" />
+                  {favorites > 1000 ? `${(favorites / 1000).toFixed(1)}k` : favorites} favorites
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Character Info Overlay */}
+      <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+        <h3 className="text-white font-bold text-sm line-clamp-2 leading-tight mb-2">
           {name}
         </h3>
-      </div>
-
-      {/* Action Bar - Hidden by default, visible on hover */}
-      <div className="absolute top-3 right-3 flex flex-col gap-2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <Link to={hreflink} className="">
-          <Button
-            variant="default"
-            size="icon"
-            className="bg-purple-600/90 hover:bg-purple-700 text-white rounded-full p-2 shadow-lg flex items-center justify-center"
-            title="View Details"
-          >
-            <span className="sr-only">View Details</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3A2.25 2.25 0 018.25 19.5V9m7.5 0H8.25m7.5 0H19.5a.75.75 0 01.75.75v8.25a2.25 2.25 0 01-2.25 2.25h-11A2.25 2.25 0 014.5 18V9.75a.75.75 0 01.75-.75h2.25" />
-            </svg>
-          </Button>
-        </Link>
-        <div className="relative group/add">
-          <Button variant="secondary" size="icon" className="rounded-full p-2 aspect-square text-pink-600 bg-white/80 hover:bg-white shadow-lg flex items-center justify-center">
-            <span className="sr-only">Add to List</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </Button>
-          <div className="absolute right-0 mt-2 z-40 min-w-[10rem] bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-zinc-200 opacity-0 group-hover/add:opacity-100 pointer-events-none group-hover/add:pointer-events-auto transition-opacity duration-200 flex flex-col overflow-hidden">
-            <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">Add to Watchlist</button>
-            <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">Add to Favorites</button>
-            <button className="px-4 py-2 text-left hover:bg-zinc-100 text-zinc-800 text-sm">Add to Custom List</button>
+        
+        <div className="flex items-center justify-between text-xs text-gray-300 opacity-0 group-hover:opacity-100 md:group-hover:opacity-100 opacity-100 md:opacity-0 transition-opacity duration-300 delay-200">
+          <div className="flex items-center gap-2">
+            {popularity && (
+              <span>Rank #{popularity}</span>
+            )}
           </div>
+          {animeAppearances > 0 && (
+            <span className="md:hidden">{animeAppearances} anime{animeAppearances !== 1 ? 's' : ''}</span>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Hover Glow Effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-r from-primary via-secondary to-primary blur-xl" />
+    </Card>
   );
 }

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import AnimeCard from "../components/animecard";
 import { Button } from "~/components/ui/button";
 import Loading from "~/components/loader";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/top-rated";
+import { generateMeta } from "~/lib/seo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +15,16 @@ import {
   DropdownMenuRadioItem,
 } from "~/components/ui/dropdown-menu";
 import { ChevronDownIcon, FilterIcon } from "lucide-react";
+
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Top Rated Anime",
+    description: "Discover the highest-rated anime series and movies of all time. Explore critically acclaimed anime with the best scores and reviews from the community.",
+    keywords: "top rated anime, best anime, highest rated anime, anime rankings, popular anime, anime reviews",
+    url: "/top-rated",
+    canonical: "https://animadom.vercel.app/top-rated",
+  });
+}
 
 interface Anime {
   mal_id: number;
@@ -77,7 +90,7 @@ export default function TopRated() {
       setIsLoading(true);
       try {
         // Build the URL with format filter if selected
-        let url = `https://api.jikan.moe/v4/top/anime?page=${currentPage}`;
+        let url = `${API_ENDPOINTS.JIKAN}/top/anime?page=${currentPage}`;
         if (format) {
           url += `&type=${format}`;
         }
@@ -158,7 +171,7 @@ export default function TopRated() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center">
           {topAnime.map((anime) => (
             <AnimeCard
               key={anime.mal_id}
@@ -199,7 +212,7 @@ export default function TopRated() {
 
               if (index === currentPage - 3 || index === currentPage + 3) {
                 return (
-                  <span key={index} className="text-white">
+                  <span key={index} className="text-muted-foreground">
                     ...
                   </span>
                 );

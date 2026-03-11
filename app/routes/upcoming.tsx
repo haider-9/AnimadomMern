@@ -1,35 +1,111 @@
 import AnimeCard from "../components/animecard";
-import { useEffect, useState } from "react";
-import Loading from "~/components/loader";
+import { useState, type Key } from "react";
 import { Button } from "~/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/upcoming";
+import { generateMeta } from "~/lib/seo";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "~/components/ui/dropdown-menu";
 import { ChevronDownIcon, FilterIcon } from "lucide-react";
 
-export default function TrendingAnime() {
-  interface Anime {
-    id: number;
-    title: {
-      romaji: string;
-      english: string;
-    };
-    coverImage: {
-      large: string;
-    };
-    idMal?: number;
-    averageScore: number;
-    format: string;
-  }
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Upcoming Anime",
+    description: "Stay updated with the latest upcoming anime releases. Discover new anime series that are coming soon and add them to your watchlist.",
+    keywords: "upcoming anime, new anime releases, anime calendar, future anime, anime schedule",
+    url: "/upcoming",
+    canonical: "https://animadom.vercel.app/upcoming",
+  });
+}
 
+interface Anime {
+  id: number;
+  title: {
+    romaji: string;
+    english: string;
+  };
+  coverImage: {
+    large: string;
+  };
+  idMal?: number;
+  averageScore: number;
+  format: string;
+}
+
+// Sort and filter options
+type SortOption =
+  | "POPULARITY_DESC"
+  | "SCORE_DESC"
+  | "START_DATE_DESC"
+  | "TITLE_ROMAJI";
+type FormatOption =
+  | "TV"
+  | "MOVIE"
+  | "OVA"
+  | "ONA"
+  | "SPECIAL"
+  | "MUSIC"
+  | null;
+
+// Fetch function for TanStack Query
+const fetchUpcomingAnime = async (page: number, sortBy: SortOption, format: FormatOption) => {
+  const formatFilter = format ? `, format: ${format}` : "";
+
+  const query = `
+    query ($page: Int, $sort: [MediaSort]) {
+      Page(page: $page, perPage: 20) {
+        pageInfo {
+          hasNextPage
+          total
+          currentPage
+          lastPage
+        }
+        media(type: ANIME, status: NOT_YET_RELEASED, sort: $sort${formatFilter}) {
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          idMal
+          averageScore
+          format
+        }
+      }
+    }
+  `;
+
+  const response = await fetch(API_ENDPOINTS.ANILIST, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables: {
+        page,
+        sort: [sortBy],
+      },
+    }),
+  });
+
+  if (!response.ok) throw new Error('Failed to fetch upcoming anime');
+  const data = await response.json();
+  return data.data.Page;
+};
+
+export default function TrendingAnime() {
   // Sort and filter options
   type SortOption =
     | "POPULARITY_DESC"
@@ -45,92 +121,37 @@ export default function TrendingAnime() {
     | "MUSIC"
     | null;
 
-  const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(true);
-
-  // Filter states
   const [sortBy, setSortBy] = useState<SortOption>("POPULARITY_DESC");
   const [format, setFormat] = useState<FormatOption>(null);
 
-  useEffect(() => {
-    handlePageChange(1);
-  }, [sortBy, format]);
+  // TanStack Query for data fetching
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["upcoming-anime", currentPage, sortBy, format],
+    queryFn: () => fetchUpcomingAnime(currentPage, sortBy, format),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-  useEffect(() => {
-    handlePageChange(currentPage);
-  }, []);
+  const trendingAnime = data?.media || [];
+  const hasNextPage = data?.pageInfo?.hasNextPage || false;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handlePageChange = async (newPage: number) => {
-    setIsLoading(true);
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     scrollToTop();
-
-    try {
-      // Build format filter condition
-      const formatFilter = format ? `, format: ${format}` : "";
-
-      const query = `
-          query ($page: Int, $sort: [MediaSort]) {
-            Page(page: $page, perPage: 20) {
-              pageInfo {
-                hasNextPage
-                total
-                currentPage
-                lastPage
-              }
-              media(type: ANIME, status: NOT_YET_RELEASED, sort: $sort${formatFilter}) {
-                title {
-                  romaji
-                  english
-                }
-                coverImage {
-                  large
-                }
-                idMal
-                averageScore
-                format
-              }
-            }
-          }
-        `;
-
-      const response = await fetch("https://graphql.anilist.co", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query,
-          variables: {
-            page: newPage,
-            sort: [sortBy],
-          },
-        }),
-      });
-
-      const data = await response.json();
-      setTrendingAnime(data.data.Page.media);
-      setHasNextPage(data.data.Page.pageInfo.hasNextPage);
-    } catch (err) {
-      setError("Failed to fetch anime");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleSortChange = (value: SortOption) => {
     setSortBy(value);
+    setCurrentPage(1); // Reset to first page when changing sort
   };
 
   const handleFormatChange = (value: FormatOption) => {
     setFormat(value);
+    setCurrentPage(1); // Reset to first page when changing format
   };
 
   const getSortLabel = (sort: SortOption) => {
@@ -154,10 +175,32 @@ export default function TrendingAnime() {
   };
 
   if (error) {
-    return <div className="text-center text-red-500 py-8">{error}</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load upcoming anime. Please try again.</AlertDescription>
+        </Alert>
+      </div>
+    );
   }
+
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div className="py-8">
+        <div className="flex justify-between items-center mb-6 px-4">
+          <Skeleton className="h-8 w-48" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-[95%] mx-auto">
+          {[...Array(20)].map((_, i) => (
+            <Skeleton key={i} className="h-80 w-full" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -244,8 +287,8 @@ export default function TrendingAnime() {
             </DropdownMenu>
           </div>
         </div>
-        <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
-          {trendingAnime.map((anime) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-[95%] mx-auto">
+          {trendingAnime.map((anime: { idMal: Key | null | undefined; title: { english: any; romaji: any; }; coverImage: { large: string; }; averageScore: number | undefined; }) => (
             <AnimeCard
               key={anime.idMal}
               title={anime.title.english || anime.title.romaji}
@@ -284,7 +327,7 @@ export default function TrendingAnime() {
               // Show ellipsis for skipped pages
               if (index === currentPage - 3 || index === currentPage + 3) {
                 return (
-                  <span key={index} className="text-white">
+                  <span key={index} className="text-muted-foreground">
                     ...
                   </span>
                 );

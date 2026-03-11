@@ -20,4 +20,6 @@ export default [
   route("search/:query", "./routes/search/$query.tsx"),
   route("top_characters", "./routes/characters.tsx"),
   route("topbyyear", "./routes/yearstop.tsx"),
+  // Splat route for catch-all handling (must be last)
+  route("*", "./routes/$.tsx"),
 ] satisfies RouteConfig;

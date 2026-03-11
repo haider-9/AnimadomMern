@@ -4,6 +4,25 @@ import AnimeCard from "~/components/animecard";
 import { cn } from "~/lib/utils";
 import Loading from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/$studioname";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({ params }: Route.MetaArgs) {
+  const studioName = params.studioname || "";
+  const decodedStudio = decodeURIComponent(studioName).replace(/-/g, " ");
+  const capitalizedStudio = decodedStudio.split(" ").map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(" ");
+  
+  return generateMeta({
+    title: `${capitalizedStudio} Studio Anime`,
+    description: `Explore anime series and movies produced by ${capitalizedStudio}. Discover the complete filmography and popular works from this renowned animation studio.`,
+    keywords: `${capitalizedStudio}, anime studio, animation studio, ${capitalizedStudio} anime, studio productions`,
+    url: `/studio/${studioName}`,
+    canonical: `https://animadom.vercel.app/studio/${studioName}`,
+  });
+}
 
 interface AnimeData {
   idMal: number;
@@ -60,7 +79,7 @@ export default function StudioPage() {
       `;
 
       try {
-        const response = await fetch("https://graphql.anilist.co", {
+        const response = await fetch(API_ENDPOINTS.ANILIST, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -111,7 +130,7 @@ export default function StudioPage() {
           Anime by {studioname}
         </h1>
         {animeList.length > 0 ? (
-          <div className="flex flex-wrap justify-center w-[95%] gap-4 mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center w-[95%] mx-auto">
             {animeList.map((anime) => (
               <AnimeCard
                 key={anime.idMal}
@@ -159,7 +178,7 @@ export default function StudioPage() {
 
                 if (index === currentPage - 3 || index === currentPage + 3) {
                   return (
-                    <span key={index} className="text-white">
+                    <span key={index} className="text-muted-foreground">
                       ...
                     </span>
                   );

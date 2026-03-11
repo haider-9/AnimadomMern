@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import CharacterCard from "~/components/charactercard";
 import Loading from "~/components/loader";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/characters";
+import { generateMeta } from "~/lib/seo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +15,16 @@ import {
   DropdownMenuRadioItem,
 } from "~/components/ui/dropdown-menu";
 import { ChevronDownIcon, FilterIcon } from "lucide-react";
+
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Top Anime Characters",
+    description: "Discover the most popular and beloved anime characters of all time. Browse through fan-favorite characters from various anime series and movies.",
+    keywords: "anime characters, popular anime characters, top characters, anime character database, character profiles",
+    url: "/top_characters",
+    canonical: "https://animadom.vercel.app/top_characters",
+  });
+}
 
 export default function Characters() {
   interface Character {
@@ -103,7 +116,7 @@ export default function Characters() {
         }
       `;
 
-      const response = await fetch("https://graphql.anilist.co", {
+      const response = await fetch(API_ENDPOINTS.ANILIST, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -213,7 +226,7 @@ export default function Characters() {
         </div>
 
         {/* Character Cards Grid */}
-        <div className="flex flex-wrap justify-center gap-4 px-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center px-4">
           {characters.map((character: Character) => (
             <CharacterCard
               key={character.id}
@@ -260,7 +273,7 @@ export default function Characters() {
               // Show ellipsis for skipped pages
               if (page === currentPage - 3 || page === currentPage + 3) {
                 return (
-                  <span key={page} className="text-white">
+                  <span key={page} className="text-muted-foreground">
                     ...
                   </span>
                 );

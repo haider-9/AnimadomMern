@@ -13,14 +13,22 @@ import {
 } from "react-icons/si";
 import { LuGithub, LuExternalLink } from "react-icons/lu";
 import { motion } from "framer-motion";
+import type { Route } from "./+types/about";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "About Animadom",
+    description: "Learn about Animadom - a comprehensive anime discovery platform built with modern web technologies. Discover our mission, features, and the technology stack behind the platform.",
+    keywords: "about animadom, anime platform, anime discovery, react anime app, anime database",
+    url: "/about",
+    canonical: "https://animadom.vercel.app/about",
+  });
+}
 
 export default function About() {
   return (
     <>
-      <head>
-        <title>Animadom | About</title>
-        <meta name="description" content="Learn about Animadom - a comprehensive anime discovery platform" />
-      </head>
       <div className="py-12 max-w-6xl mx-auto space-y-10 px-4 sm:px-6">
         {/* Project Overview Section */}
         <motion.section 

@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import AnimeCard from '../components/animecard'
 import { Button } from '~/components/ui/button'
-import Loading from '~/components/loader'
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/yearstop";
+import { generateMeta } from "~/lib/seo";
 import {
   Select,
   SelectContent,
@@ -11,96 +16,140 @@ import {
   SelectValue,
 } from "../components/ui/select"
 
-export default function YearsTop() {
-  const [topAnime, setTopAnime] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Top Anime by Year & Season",
+    description: "Explore the best anime series organized by year and season. Discover top-rated anime from different time periods and seasonal releases.",
+    keywords: "anime by year, seasonal anime, anime seasons, anime by decade, anime timeline, yearly anime rankings",
+    url: "/topbyyear",
+    canonical: "https://animadom.vercel.app/topbyyear",
+  });
+}
+
+// Fetch function for TanStack Query
+const fetchTopAnimeByYear = async (year: number, season: string, page: number) => {
+  const query = `
+    query ($season: MediaSeason, $seasonYear: Int, $page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        pageInfo {
+          total
+          perPage
+          currentPage
+          lastPage
+        }
+        media(season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, type: ANIME) {
+          idMal
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+          averageScore
+        }
+      }
+    }
+  `;
   
+  const variables = {
+    season,
+    seasonYear: year,
+    page,
+    perPage: 12
+  };
+  
+  const response = await fetch(API_ENDPOINTS.ANILIST, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      variables
+    })
+  });
+  
+  if (!response.ok) throw new Error('Failed to fetch top anime');
+  const data = await response.json();
+  return data.data.Page;
+};
+
+function getCurrentSeason() {
+  const month = new Date().getMonth() + 1
+  if (month >= 3 && month <= 5) return 'SPRING'
+  if (month >= 6 && month <= 8) return 'SUMMER'
+  if (month >= 9 && month <= 11) return 'FALL'
+  return 'WINTER'
+}
+
+export default function YearsTop() {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 40 }, (_, i) => currentYear - i)
   const seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
   
   const [activeYear, setActiveYear] = useState(currentYear)
   const [activeSeason, setActiveSeason] = useState(getCurrentSeason())
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // TanStack Query for data fetching
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["top-anime-by-year", activeYear, activeSeason, currentPage],
+    queryFn: () => fetchTopAnimeByYear(activeYear, activeSeason, currentPage),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const topAnime = data?.media || [];
+  const totalPages = data?.pageInfo?.lastPage || 0;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
     window.scrollTo(0, 0)
   }
 
-  useEffect(() => {
-    const fetchTopAnime = async () => {
-      try {
-        setLoading(true)
-        
-        const query = `
-          query ($season: MediaSeason, $seasonYear: Int, $page: Int, $perPage: Int) {
-            Page(page: $page, perPage: $perPage) {
-              pageInfo {
-                total
-                perPage
-                currentPage
-                lastPage
-              }
-              media(season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, type: ANIME) {
-                idMal
-                title {
-                  romaji
-                  english
-                }
-                coverImage {
-                  large
-                }
-                averageScore
-              }
-            }
-          }
-        `
-        
-        const variables = {
-          season: activeSeason,
-          seasonYear: activeYear,
-          page: currentPage,
-          perPage: 12
-        }
-        
-        const response = await fetch('https://graphql.anilist.co', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            query,
-            variables
-          })
-        })
-        
-        const data = await response.json()
-        setTopAnime(data.data.Page.media)
-        setTotalPages(data.data.Page.pageInfo.lastPage)
-        setLoading(false)
-      } catch (err) {
-        setError('Failed to fetch top anime')
-        setLoading(false)
-      }
-    }
+  const handleYearChange = (year: number) => {
+    setActiveYear(year);
+    setCurrentPage(1); // Reset to first page
+  };
 
-    fetchTopAnime()
-  }, [activeYear, activeSeason, currentPage])
+  const handleSeasonChange = (season: string) => {
+    setActiveSeason(season);
+    setCurrentPage(1); // Reset to first page
+  };
 
-  function getCurrentSeason() {
-    const month = new Date().getMonth() + 1
-    if (month >= 3 && month <= 5) return 'SPRING'
-    if (month >= 6 && month <= 8) return 'SUMMER'
-    if (month >= 9 && month <= 11) return 'FALL'
-    return 'WINTER'
+  if (isLoading) {
+    return (
+      <div className="min-h-screen mt-3">
+        <div className="container mx-auto px-6">
+          <Skeleton className="h-8 w-64 mb-6" />
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <Skeleton className="h-10 w-full sm:w-1/3" />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center">
+            {[...Array(12)].map((_, i) => (
+              <Skeleton key={i} className="h-80 w-48" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  if (loading) return <Loading />
-  if (error) return <div className="text-destructive">{error}</div>
+  if (error) {
+    return (
+      <div className="container mx-auto px-6 py-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load anime data. Please try again.</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -115,7 +164,7 @@ export default function YearsTop() {
           <div className="w-full sm:w-1/3">
             <Select
               value={activeYear.toString()}
-              onValueChange={(value) => setActiveYear(parseInt(value))}
+              onValueChange={(value) => handleYearChange(parseInt(value))}
             >
               <SelectTrigger className="w-full bg-secondary/50 border-border">
                 <SelectValue placeholder="Select Year" />
@@ -135,7 +184,7 @@ export default function YearsTop() {
             {seasons.map((season) => (
               <Button
                 key={season}
-                onClick={() => setActiveSeason(season)}
+                onClick={() => handleSeasonChange(season)}
                 className={`
                   relative group flex items-center justify-center gap-2
                   ${
@@ -166,7 +215,7 @@ export default function YearsTop() {
           key={`${activeYear}-${activeSeason}-${currentPage}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex flex-wrap justify-center gap-4"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center"
         >
           {topAnime.length > 0 ? (
             topAnime.map((anime) => (

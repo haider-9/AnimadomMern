@@ -2,9 +2,20 @@ import { useEffect, useState } from "react";
 import CollectionCard from "../components/collectioncard";
 import Loading from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/collections";
+import { generateMeta } from "~/lib/seo";
 
-const JIKAN_API = "https://api.jikan.moe/v4";
-const KITSU_API = "https://kitsu.io/api/edge";
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Anime Collections",
+    description: "Explore curated anime collections organized by genres, themes, and popularity. Discover new anime series through our carefully crafted collections.",
+    keywords: "anime collections, anime genres, anime categories, anime discovery, curated anime lists",
+    url: "/collections",
+    canonical: "https://animadom.vercel.app/collections",
+  });
+}
+
 const GENRES_PER_PAGE = 20;
 
 export default function Collections() {
@@ -30,7 +41,7 @@ export default function Collections() {
       setLoading(true);
       try {
         // Fetch genres from Jikan
-        const genresResponse = await fetch(`${JIKAN_API}/genres/anime`);
+        const genresResponse = await fetch(`${API_ENDPOINTS.JIKAN}/genres/anime`);
         if (!genresResponse.ok) throw new Error("Failed to fetch genres");
         const genresData = await genresResponse.json();
         const allGenres = genresData.data.map((genre: any) => genre.name);
@@ -46,7 +57,7 @@ export default function Collections() {
         const collectionsData = await Promise.all(
           currentGenres.map(async (genre: string) => {
             const kitsuResponse = await fetch(
-              `${KITSU_API}/anime?filter[genres]=${genre}&page[limit]=4&sort=-averageRating`,
+              `${API_ENDPOINTS.KITSU}/anime?filter[genres]=${genre}&page[limit]=4&sort=-averageRating`,
               {
                 headers: {
                   Accept: "application/vnd.api+json",
@@ -90,7 +101,7 @@ export default function Collections() {
       {loading && <Loading />}
 
       {error && <div className="text-red-500 text-center p-4">{error}</div>}
-      <div className="flex flex-wrap justify-center gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center">
         {collections.map((collection, index) => (
           <CollectionCard
             key={`${collection.title}-${index}`}
@@ -130,7 +141,7 @@ export default function Collections() {
             }
             if (index === currentPage - 3 || index === currentPage + 3) {
               return (
-                <span key={index} className="text-white">
+                <span key={index} className="text-muted-foreground">
                   ...
                 </span>
               );

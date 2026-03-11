@@ -4,6 +4,23 @@ import { useParams } from "react-router";
 import AnimeCard from "~/components/animecard";
 import { Button } from "~/components/ui/button";
 import { topAnime } from "~/constants";
+import type { Route } from "./+types/$name";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({ params }: Route.MetaArgs) {
+  const userName = params.name || "";
+  const decodedName = decodeURIComponent(userName);
+  
+  return generateMeta({
+    title: `${decodedName}'s Profile`,
+    description: `View ${decodedName}'s anime profile, watchlist, and statistics. Discover what anime they're watching, planning to watch, and have completed.`,
+    keywords: `anime profile, user profile, ${decodedName}, anime list, watchlist`,
+    url: `/user/${userName}`,
+    type: "profile",
+    canonical: `https://animadom.vercel.app/user/${userName}`,
+    noIndex: true, // User profiles are typically not indexed for privacy
+  });
+}
 
 const watchingAnime = topAnime.filter((anime) =>
   [16498, 21, 44511, 1735].includes(anime.id)

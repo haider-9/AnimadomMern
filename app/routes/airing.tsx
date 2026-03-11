@@ -2,6 +2,19 @@ import AnimeCard from "../components/animecard";
 import { useEffect, useState } from "react";
 import Loading from "~/components/loader";
 import { Button } from "~/components/ui/button";
+import { API_ENDPOINTS } from "~/constants";
+import type { Route } from "./+types/airing";
+import { generateMeta } from "~/lib/seo";
+
+export function meta({}: Route.MetaArgs) {
+  return generateMeta({
+    title: "Trending Anime",
+    description: "Discover the most popular and trending anime series currently airing. Stay up-to-date with what the anime community is watching right now.",
+    keywords: "trending anime, popular anime, currently airing anime, seasonal anime, anime trends",
+    url: "/trending",
+    canonical: "https://animadom.vercel.app/trending",
+  });
+}
 
 export default function TrendingAnime() {
   interface Anime {
@@ -55,7 +68,7 @@ export default function TrendingAnime() {
           }
         `;
 
-        const response = await fetch("https://graphql.anilist.co", {
+        const response = await fetch(API_ENDPOINTS.ANILIST, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -133,7 +146,7 @@ export default function TrendingAnime() {
 
               if (index === currentPage - 3 || index === currentPage + 3) {
                 return (
-                  <span key={index} className="text-white">
+                  <span key={index} className="text-muted-foreground">
                     ...
                   </span>
                 );
