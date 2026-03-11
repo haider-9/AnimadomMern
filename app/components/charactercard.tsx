@@ -50,7 +50,6 @@ export default function CharacterCard({
         loading="lazy"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-50 group-hover:opacity-90 transition-opacity duration-300" />
 
       {/* Role Badge */}
       <Badge 
