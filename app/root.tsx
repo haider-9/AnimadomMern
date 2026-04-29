@@ -25,9 +25,44 @@ export function meta(): Route.MetaDescriptors {
   return [
     { charset: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
+    { title: "AnimaDom - Your Ultimate Anime Discovery Platform" },
+    { name: "description", content: "Discover, track, and explore your favorite anime series. Browse extensive anime database, get personalized recommendations, and join the anime community on AnimaDom." },
+    { name: "keywords", content: "anime, manga, anime streaming, anime database, anime tracker, anime recommendations, watch anime, anime community, MyAnimeList, AniList, anime series, anime movies" },
+    { name: "author", content: "AnimaDom" },
     { name: "theme-color", content: "#000000" },
     { name: "color-scheme", content: "dark light" },
     { name: "format-detection", content: "telephone=no" },
+    
+    // Open Graph / Facebook
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: "https://animadom.vercel.app" },
+    { property: "og:title", content: "AnimaDom - Your Ultimate Anime Discovery Platform" },
+    { property: "og:description", content: "Discover, track, and explore your favorite anime series. Browse extensive anime database with personalized recommendations." },
+    { property: "og:image", content: "https://animadom.vercel.app/og-image.png" },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
+    { property: "og:site_name", content: "AnimaDom" },
+    { property: "og:locale", content: "en_US" },
+    
+    // Twitter Card
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:url", content: "https://animadom.vercel.app" },
+    { name: "twitter:title", content: "AnimaDom - Your Ultimate Anime Discovery Platform" },
+    { name: "twitter:description", content: "Discover, track, and explore your favorite anime series. Browse extensive anime database with personalized recommendations." },
+    { name: "twitter:image", content: "https://animadom.vercel.app/og-image.png" },
+    { name: "twitter:creator", content: "@animadom" },
+    
+    // Additional SEO
+    { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+    { name: "googlebot", content: "index, follow" },
+    { name: "application-name", content: "AnimaDom" },
+    { name: "apple-mobile-web-app-capable", content: "yes" },
+    { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+    { name: "apple-mobile-web-app-title", content: "AnimaDom" },
+    { name: "mobile-web-app-capable", content: "yes" },
+    
+    // Verification (add your actual verification codes)
+    // { name: "google-site-verification", content: "your-verification-code" },
   ];
 }
 
@@ -49,8 +84,13 @@ export const links: Route.LinksFunction = () => [
   // Favicon and app icons
   { rel: "icon", href: "/favicon.png" },
   { rel: "apple-touch-icon", href: "/logo.png" },
+  { rel: "manifest", href: "/site.webmanifest" },
   // Preload critical resources
   { rel: "preload", href: "/logo.png", as: "image" },
+  // Canonical URL
+  { rel: "canonical", href: "https://animadom.vercel.app" },
+  // Sitemap
+  { rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
