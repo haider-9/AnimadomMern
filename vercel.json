@@ -26,7 +26,7 @@
       ]
     },
     {
-      "source": "/api/(.*)",
+      "source": "/api/:path*",
       "headers": [
         {
           "key": "Cache-Control",
@@ -35,7 +35,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(png|jpg|jpeg|gif|webp|svg|ico))",
+      "source": "/:path*(png|jpg|jpeg|gif|webp|svg|ico)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -44,7 +44,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(js|css|woff|woff2|ttf|otf))",
+      "source": "/:path*(js|css|woff|woff2|ttf|otf)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -53,6 +53,5 @@
       ]
     }
   ],
-
   "trailingSlash": false
 }
