@@ -57,7 +57,7 @@ export default function Collections() {
         const collectionsData = await Promise.all(
           currentGenres.map(async (genre: string) => {
             const kitsuResponse = await fetch(
-              `${API_ENDPOINTS.KITSU}/anime?filter[genres]=${genre}&page[limit]=4&sort=-averageRating`,
+              `${API_ENDPOINTS.KITSU}/anime?filter[genres]=${genre}&page[limit]=10&sort=-averageRating`,
               {
                 headers: {
                   Accept: "application/vnd.api+json",
@@ -70,13 +70,16 @@ export default function Collections() {
             const kitsuData = await kitsuResponse.json();
 
             const validAnime = kitsuData.data
-              .filter((anime: any) => anime.attributes.posterImage?.medium)
-              .slice(0, 4);
+              .filter((anime: any) => anime.attributes.posterImage?.medium);
+
+            // Shuffle and pick random 4 images
+            const shuffled = [...validAnime].sort(() => 0.5 - Math.random());
+            const randomAnime = shuffled.slice(0, 4);
 
             return {
               title: genre,
               slug: genre.toLowerCase().replace(/\s+/g, "-"),
-              images: validAnime.map((anime: any) => anime.attributes.posterImage.medium),
+              images: randomAnime.map((anime: any) => anime.attributes.posterImage.medium),
             };
           })
         );

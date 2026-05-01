@@ -41,19 +41,20 @@ export default function CharacterCard({
   };
 
   return (
-    <Card className="relative w-full p-0 h-80 overflow-hidden group transition-all duration-500  hover:shadow-2xl hover:shadow-secondary/20 border-0 bg-gradient-to-br from-card/60 to-card/90 backdrop-blur-sm">
-     
-      <img
-        src={imageUrl || "https://dummyimage.com/400x400"}
-        alt={name}
-        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
-        loading="lazy"
-      />
+    <Link to={hreflink} className="block">
+      <Card className="relative w-full p-0 h-80 overflow-hidden group transition-all duration-500  hover:shadow-2xl hover:shadow-secondary/20 border-0 bg-gradient-to-br from-card/60 to-card/90 backdrop-blur-sm">
+       
+        <img
+          src={imageUrl || "https://dummyimage.com/400x400"}
+          alt={name}
+          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+          loading="lazy"
+        />
 
 
       {/* Role Badge */}
       <Badge 
-        className={`absolute top-3 left-3 ${getRoleColor(role)} border-0 backdrop-blur-md shadow-lg transform -translate-y-2 group-hover:translate-y-0 transition-all duration-300 font-medium`}
+        className={`absolute top-3 left-3 ${getRoleColor(role)} border-0 backdrop-blur-md shadow-lg transform -translate-y-2 group-hover:translate-y-0 transition-all duration-300 font-medium pointer-events-none`}
       >
         {role}
       </Badge>
@@ -62,9 +63,10 @@ export default function CharacterCard({
       <Button
         variant="secondary"
         size="icon"
-        className="absolute top-3 right-3 md:hidden backdrop-blur-md shadow-lg h-8 w-8 rounded-full"
+        className="absolute top-3 right-3 md:hidden backdrop-blur-md shadow-lg h-8 w-8 rounded-full pointer-events-auto z-10"
         onClick={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           setShowMobileActions(!showMobileActions);
         }}
       >
@@ -72,7 +74,7 @@ export default function CharacterCard({
       </Button>
 
       {/* Stats Badges - Desktop */}
-      <div className="absolute top-3 right-3 hidden md:flex flex-col gap-2 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+      <div className="absolute top-3 right-3 hidden md:flex flex-col gap-2 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
         {animeAppearances > 0 && (
           <Badge variant="secondary" className="backdrop-blur-md shadow-lg text-xs">
             <LuTv className="w-3 h-3 mr-1" />
@@ -88,11 +90,11 @@ export default function CharacterCard({
       </div>
 
       {/* Desktop Action Buttons (hover) */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 delay-150 max-md:hidden">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 delay-150 max-md:hidden pointer-events-none group-hover:pointer-events-auto">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="default" size="icon" asChild className="rounded-full h-12 w-12 backdrop-blur-md shadow-xl hover:scale-110 transition-transform">
-              <Link to={hreflink}>
+            <Button variant="default" size="icon" asChild className="rounded-full h-12 w-12 backdrop-blur-md shadow-xl hover:scale-110 transition-transform pointer-events-auto">
+              <Link to={hreflink} onClick={(e) => e.stopPropagation()}>
                 <LuEye className="w-5 h-5" />
                 <span className="sr-only">View Details</span>
               </Link>
@@ -108,9 +110,10 @@ export default function CharacterCard({
             <Button 
               size="icon" 
               variant={isFavorited ? "default" : "secondary"} 
-              className="rounded-full h-10 w-10 backdrop-blur-md shadow-lg hover:scale-110 transition-all"
+              className="rounded-full h-10 w-10 backdrop-blur-md shadow-lg hover:scale-110 transition-all pointer-events-auto"
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 setIsFavorited(!isFavorited);
               }}
             >
@@ -126,9 +129,9 @@ export default function CharacterCard({
 
       {/* Mobile Action Buttons (toggle) */}
       {showMobileActions && (
-        <div className="absolute top-12 right-3 md:hidden flex flex-col gap-2 bg-black/80 backdrop-blur-md rounded-lg p-2 shadow-xl">
+        <div className="absolute top-12 right-3 md:hidden flex flex-col gap-2 bg-black/80 backdrop-blur-md rounded-lg p-2 shadow-xl pointer-events-auto z-20">
           <Button variant="default" size="sm" asChild className="rounded-lg">
-            <Link to={hreflink}>
+            <Link to={hreflink} onClick={(e) => e.stopPropagation()}>
               <LuEye className="w-4 h-4 mr-2" />
               View
             </Link>
@@ -140,6 +143,7 @@ export default function CharacterCard({
             className="rounded-lg"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               setIsFavorited(!isFavorited);
             }}
           >
@@ -168,7 +172,7 @@ export default function CharacterCard({
       )}
 
       {/* Character Info Overlay */}
-      <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+      <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 pointer-events-none">
         <h3 className="text-white font-bold text-sm line-clamp-2 leading-tight mb-2">
           {name}
         </h3>
@@ -186,7 +190,8 @@ export default function CharacterCard({
       </div>
 
       {/* Hover Glow Effect */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-r from-primary via-secondary to-primary blur-xl" />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-r from-primary via-secondary to-primary blur-xl pointer-events-none" />
     </Card>
+    </Link>
   );
 }
