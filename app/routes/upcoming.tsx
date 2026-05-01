@@ -207,21 +207,21 @@ export default function TrendingAnime() {
     <>
       <title>Animadom | Upcoming Anime</title>
       <section className="py-8">
-        <div className="flex justify-between items-center mb-6 px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-4">
           <h2 className="md:text-2xl text-xl font-bold">Upcoming Anime</h2>
-          <div className="flex gap-2 flex-col md:flex-row">
+          <div className="flex gap-2 w-full sm:w-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="flex items-center md:text-sm text-xs gap-1"
+                  className="flex items-center text-xs sm:text-sm gap-1 flex-1 sm:flex-initial"
                 >
                   <FilterIcon className="h-4 w-4" />
-                  Sort: {getSortLabel(sortBy)}
+                  <span className="hidden sm:inline">Sort:</span> {getSortLabel(sortBy)}
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" side="bottom" className="w-56">
                 <DropdownMenuLabel>Sort By</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
@@ -250,13 +250,13 @@ export default function TrendingAnime() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="flex items-center md:text-sm text-xs gap-1"
+                  className="flex items-center text-xs sm:text-sm gap-1 flex-1 sm:flex-initial"
                 >
-                  Format: {getFormatLabel(format)}
+                  <span className="hidden sm:inline">Format:</span> {getFormatLabel(format)}
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" side="bottom" className="w-56">
                 <DropdownMenuLabel>Format</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup

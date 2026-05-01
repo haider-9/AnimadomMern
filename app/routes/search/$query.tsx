@@ -70,6 +70,7 @@ export default function SearchResults() {
   const params = useParams();
   const [activeTab, setActiveTab] = useState("anime");
   const [loading, setLoading] = useState(true);
+  const [tabLoading, setTabLoading] = useState(false);
 
   const [results, setResults] = useState<SearchResults>({
     anime: [],
@@ -143,7 +144,10 @@ export default function SearchResults() {
   };
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    const isInitialLoad = loading;
+    if (!isInitialLoad) {
+      setTabLoading(true);
+    }
     const query = decodeURIComponent(params.query || "");
 
     try {
@@ -202,6 +206,7 @@ export default function SearchResults() {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
+      setTabLoading(false);
     }
   }, [params.query, currentPage, activeTab]);
 
@@ -223,14 +228,14 @@ export default function SearchResults() {
       <title>Animadom | Search Results</title>
       <div className="min-h-screen mt-3 theme-transition">
         <div className="container mx-auto px-6">
-          <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-card/80 p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-border">
-            <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 w-full">
+          <nav className="flex flex-col sm:flex-row gap-3 mb-6 bg-card/80 p-2 sm:p-4 rounded-xl sticky top-0 backdrop-blur-sm z-10 border border-border">
+            <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-3 w-full">
               {tabs.map((tab) => (
                 <Button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`
-                  relative group flex items-center justify-center gap-2
+                  relative group flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm
                   ${
                     activeTab === tab.id
                       ? "bg-primary/10 text-primary ring-1 ring-primary/20"
@@ -238,8 +243,9 @@ export default function SearchResults() {
                   }
                 `}
                 >
-                  <span>{tab.icon}</span>
-                  <span>{tab.label}</span>
+                  <span className="text-base sm:text-lg">{tab.icon}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                   {activeTab === tab.id && (
                     <motion.div
                       layoutId="activeTab"
@@ -256,58 +262,64 @@ export default function SearchResults() {
             </div>
           </nav>
 
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center"
-          >
-            {activeTab === "anime" &&
-              results.anime.map((anime) => (
-                <AnimeCard
-                  key={anime.idMal}
-                  imageUrl={anime.coverImage.large}
-                  title={anime.title.english || anime.title.romaji}
-                  hreflink={`/anime/${anime.idMal}`}
-                  score={anime.averageScore / 10}
-                />
-              ))}
+          {tabLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center"
+            >
+              {activeTab === "anime" &&
+                results.anime.map((anime) => (
+                  <AnimeCard
+                    key={anime.idMal}
+                    imageUrl={anime.coverImage.large}
+                    title={anime.title.english || anime.title.romaji}
+                    hreflink={`/anime/${anime.idMal}`}
+                    score={anime.averageScore / 10}
+                  />
+                ))}
 
-            {activeTab === "characters" &&
-              results.characters.map((char) => (
-                <CharacterCard
-                  key={char.mal_id}
-                  imageUrl={char.images?.jpg?.image_url}
-                  name={char.name}
-                  role="Main"
-                  hreflink={`/character/${char.mal_id}`}
-                  animeAppearances={char.anime?.length || 0}
-                />
-              ))}
+              {activeTab === "characters" &&
+                results.characters.map((char) => (
+                  <CharacterCard
+                    key={char.mal_id}
+                    imageUrl={char.images?.jpg?.image_url}
+                    name={char.name}
+                    role="Main"
+                    hreflink={`/character/${char.mal_id}`}
+                    animeAppearances={char.anime?.length || 0}
+                  />
+                ))}
 
-            {activeTab === "genres" &&
-              results.genres.map((anime) => (
-                <AnimeCard
-                  key={anime.idMal}
-                  imageUrl={anime.coverImage.large}
-                  title={anime.title.english || anime.title.romaji}
-                  hreflink={`/anime/${anime.idMal}`}
-                  score={anime.averageScore / 10}
-                />
-              ))}
+              {activeTab === "genres" &&
+                results.genres.map((anime) => (
+                  <AnimeCard
+                    key={anime.idMal}
+                    imageUrl={anime.coverImage.large}
+                    title={anime.title.english || anime.title.romaji}
+                    hreflink={`/anime/${anime.idMal}`}
+                    score={anime.averageScore / 10}
+                  />
+                ))}
 
-            {activeTab === "voiceActors" &&
-              results.voiceActors.map((actor) => (
-                <CharacterCard
-                  key={actor.mal_id}
-                  imageUrl={actor.images?.jpg?.image_url}
-                  name={actor.name}
-                  role="Voice Actor"
-                  hreflink={`/people/${actor.mal_id}`}
-                  animeAppearances={actor.anime?.length || 0}
-                />
-              ))}
-          </motion.div>
+              {activeTab === "voiceActors" &&
+                results.voiceActors.map((actor) => (
+                  <CharacterCard
+                    key={actor.mal_id}
+                    imageUrl={actor.images?.jpg?.image_url}
+                    name={actor.name}
+                    role="Voice Actor"
+                    hreflink={`/people/${actor.mal_id}`}
+                    animeAppearances={actor.anime?.length || 0}
+                  />
+                ))}
+            </motion.div>
+          )}
 
           <div className="mt-8 flex justify-center">
             <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 max-w-[90vw]">

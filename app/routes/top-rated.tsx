@@ -121,55 +121,57 @@ export default function TopRated() {
     <>
       <title>Top Rated Anime</title>
       <div className="min-h-screen py-8">
-        <div className="flex justify-between items-center mb-8 px-4">
-          <h1 className="text-3xl font-bold">Top Rated Anime</h1>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex items-center md:text-sm text-xs gap-1"
-              >
-                <FilterIcon className="h-4 w-4" />
-                Format: {getFormatLabel(format)}
-                <ChevronDownIcon className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filter by Format</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup
-                value={format}
-                onValueChange={(value) =>
-                  handleFormatChange(value as FormatType)
-                }
-              >
-                <DropdownMenuRadioItem value="">
-                  All Formats
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="tv">TV</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="movie">
-                  Movie
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="ova">OVA</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="special">
-                  Special
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="ona">ONA</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="music">
-                  Music
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="cm">
-                  Commercial
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="pv">
-                  Promotional Video
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="tv_special">
-                  TV Special
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 px-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">Top Rated Anime</h1>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center text-xs sm:text-sm gap-1 flex-1 sm:flex-initial"
+                >
+                  <FilterIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">Format:</span> {getFormatLabel(format)}
+                  <ChevronDownIcon className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom" className="w-56">
+                <DropdownMenuLabel>Filter by Format</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={format}
+                  onValueChange={(value) =>
+                    handleFormatChange(value as FormatType)
+                  }
+                >
+                  <DropdownMenuRadioItem value="">
+                    All Formats
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="tv">TV</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="movie">
+                    Movie
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="ova">OVA</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="special">
+                    Special
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="ona">ONA</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="music">
+                    Music
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="cm">
+                    Commercial
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="pv">
+                    Promotional Video
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="tv_special">
+                    TV Special
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 justify-items-center">
           {topAnime.map((anime) => (

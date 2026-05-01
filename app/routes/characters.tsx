@@ -186,14 +186,14 @@ export default function Characters() {
       />
 
       <section className="py-8">
-        <div className="flex justify-between items-center mb-6 px-4">
-          <h2 className="text-2xl font-bold">Top Characters</h2>
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-4">
+          <h2 className="text-xl sm:text-2xl font-bold">Top Characters</h2>
+          <div className="flex gap-2 w-full sm:w-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-1">
+                <Button variant="outline" className="flex items-center gap-1 text-xs sm:text-sm flex-1 sm:flex-initial">
                   <FilterIcon className="h-4 w-4" />
-                  Sort: {getSortLabel(sortBy)}
+                  <span className="hidden sm:inline">Sort:</span> {getSortLabel(sortBy)}
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
