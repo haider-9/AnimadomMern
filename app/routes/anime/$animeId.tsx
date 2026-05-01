@@ -143,9 +143,15 @@ export async function clientLoader({
 
   const jikanData = await fetchJikanData();
   const anilistData = await fetchAniListData(animeId);
-  const kitsuData = await fetchKitsuData(
-    jikanData.animeData.title_english || jikanData.animeData.title
-  );
+  
+  // Safely get the title for Kitsu search
+  const searchTitle = jikanData?.animeData?.title_english || 
+                      jikanData?.animeData?.title || 
+                      jikanData?.animeData?.title_japanese || 
+                      "Unknown";
+  
+  const kitsuData = await fetchKitsuData(searchTitle);
+  
   return {
     animeId,
     ...jikanData,
@@ -165,9 +171,9 @@ export function meta({ data }: Route.MetaArgs) {
 
   const { animeData, animeDetails } = data;
   const title = animeData.title_english || animeData.title;
-  const description = animeData.synopsis || "No description available";
-  const image = animeDetails?.posterImage || animeData.images?.jpg?.large_image_url;
-  const genres = animeData.genres?.map((g: any) => g.name).join(", ");
+  const description = animeData?.synopsis || "No description available";
+  const image = animeDetails?.posterImage || animeData?.images?.jpg?.large_image_url;
+  const genres = animeData?.genres?.map((g: any) => g.name).join(", ") || "Unknown";
 
   const seoMeta = generateMeta({
     title,
@@ -225,8 +231,15 @@ export default function AnimeDescription({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const { genres, score, synopsis, title, title_english, type } = animeData;
-  const { endDate, nextEpisode, startDate, studios, characterImages, additionalCoverImages } = animeDetails;
+  const { 
+    genres = [], 
+    score, 
+    synopsis, 
+    title, 
+    title_english, 
+    type 
+  } = animeData || {};
+  const { endDate, nextEpisode, startDate, studios, characterImages, additionalCoverImages } = animeDetails || {};
 
   // Collect all available images from different sources
   const getAllImages = () => {
