@@ -11,8 +11,9 @@ import {
   LibrarySquare,
   Sword,
   Info,
+  ArrowUpRight,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { Button } from "./ui/button";
 import { useState, useContext, useEffect } from "react";
 import { FaSearch, FaRegTimesCircle } from "react-icons/fa";
@@ -42,6 +43,7 @@ export default function Header() {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [isHoveringTheme, setIsHoveringTheme] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user, logout } = useContext(AuthContext);
 
   useEffect(() => {
@@ -175,54 +177,53 @@ export default function Header() {
         </div>
 
         <div className="relative hidden lg:block">
-          <div
-            className={`flex items-center rounded-full bg-secondary/30 hover:bg-secondary/50 transition-all duration-300 ${
-              isSearchExpanded ? "w-72" : "w-10"
-            }`}
-          >
+          {!isSearchExpanded ? (
             <button
               onClick={() => setIsSearchExpanded(true)}
-              className={`p-3 text-muted-foreground hover:text-foreground transition-colors ${
-                isSearchExpanded ? "hidden" : "block"
-              }`}
+              className="p-3 text-muted-foreground hover:text-foreground transition-colors rounded-full bg-secondary/30 hover:bg-secondary/50"
             >
               <FaSearch className="h-4 w-4" />
             </button>
-
-            {isSearchExpanded && (
-              <motion.div
-                className="flex-1 flex items-center px-4 py-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <FaSearch className="h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter" && search.trim()) {
-                      navigate(`/search/${encodeURIComponent(search.trim())}`);
-                      setIsSearchExpanded(false);
-                      setSearch("");
-                    }
-                  }}
-                  placeholder="Search anime..."
-                  className="w-full px-3 bg-transparent text-sm focus:outline-none"
-                  autoFocus
-                />
-                <button
-                  onClick={() => {
-                    setSearch("");
+          ) : (
+            <motion.div
+              className="absolute right-0 top-0 flex items-center rounded-full bg-secondary/30 hover:bg-secondary/50 px-4 py-2 w-72 shadow-lg border border-border z-50"
+              initial={{ opacity: 0, scale: 0.8, x: 20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.8, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <FaSearch className="h-4 w-4 text-muted-foreground mr-3" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" && search.trim()) {
+                    navigate(`/search/${encodeURIComponent(search.trim())}`);
                     setIsSearchExpanded(false);
-                  }}
-                  className="p-1 hover:text-foreground text-muted-foreground"
-                >
-                  <FaRegTimesCircle className="h-4 w-4" />
-                </button>
-              </motion.div>
-            )}
-          </div>
+                    setSearch("");
+                  }
+                }}
+                onBlur={() => {
+                  if (!search.trim()) {
+                    setIsSearchExpanded(false);
+                  }
+                }}
+                placeholder="Search anime..."
+                className="flex-1 bg-transparent text-sm focus:outline-none"
+                autoFocus
+              />
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setIsSearchExpanded(false);
+                }}
+                className="p-1 hover:text-foreground text-muted-foreground"
+              >
+                <FaRegTimesCircle className="h-4 w-4" />
+              </button>
+            </motion.div>
+          )}
         </div>
 
         <motion.button
@@ -346,208 +347,158 @@ export default function Header() {
         </Button>
       </div>
 
+      {/* Mobile Menu Overlay - Portfolio2.0 Style */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
+            animate={{ opacity: 1, clipPath: "circle(150% at 100% 0%)" }}
+            exit={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[99] bg-background overflow-y-auto"
             onClick={() => setIsSidebarOpen(false)}
           >
-            <motion.div
-              className="absolute right-0 top-0 h-full w-72 bg-sidebar p-6 border-l border-border"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between mb-8">
-                  <motion.div
-                    className="size-14 rounded-full overflow-hidden border-2 border-primary"
-                    whileHover={{ rotate: 15 }}
-                  >
-                    <img
-                      src="/favicon.png"
-                      alt="logo"
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full"
-                    onClick={() => setIsSidebarOpen(false)}
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-
-                <div className="mb-6">
-                  <div className="bg-sidebar-accent/10 rounded-full flex items-center border border-border">
-                    <FaSearch className="ml-4 h-4 w-4 opacity-60" />
-                    <input
-                      type="text"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter" && search.trim()) {
-                          navigate(
-                            `/search/${encodeURIComponent(search.trim())}`
-                          );
-                          setIsSidebarOpen(false);
-                          setSearch("");
-                        }
-                      }}
-                      placeholder="Search anime..."
-                      className="w-full px-3 py-3 bg-transparent text-sm focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <nav className="mb-8">
-                  <ul className="flex gap-8 flex-col text-sm font-medium">
-                    {[
-                      "Home",
-                      "Upcoming",
-                      "Collections",
-                      "Top Characters",
-                      "About",
-                    ].map((item) => (
-                      <motion.li
-                        key={item}
-                        whileHover={{ y: -2 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        {item == "Home" ? (
-                          <Link
-                            to={"/"}
-                            className="hover:text-primary transition-colors duration-200 flex items-center gap-2"
-                          >
-                            {navIcons[item]} Home
-                          </Link>
-                        ) : (
-                          <Link
-                            to={`/${item.toLowerCase().replace(" ", "_")}`}
-                            className="hover:text-primary transition-colors duration-200 flex items-center gap-2"
-                          >
-                            {navIcons[item]}
-                            {item}
-                          </Link>
-                        )}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </nav>
-
-                <RandomButton />
-
-                <div
-                  className="mt-6 flex items-center gap-3 cursor-pointer"
-                  onClick={toggleTheme}
+            <div className="min-h-screen flex flex-col p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+              {/* Close Button */}
+              <div className="flex justify-end mb-6">
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="text-foreground w-12 h-12 bg-secondary/30 rounded-full flex items-center justify-center hover:bg-secondary/50 transition-colors"
                 >
-                  <div className="w-12 h-6 rounded-full bg-sidebar-accent/20 relative">
-                    <motion.div
-                      className="absolute top-1 left-1 w-4 h-4 rounded-full bg-primary"
-                      animate={{ x: isDarkTheme ? 0 : 24 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 20,
-                      }}
-                    />
-                  </div>
-                  <span className="text-sm flex items-center gap-2">
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Logo */}
+              <div className="flex items-center gap-3 mb-8">
+                <motion.div
+                  className="w-10 h-10 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center"
+                  whileHover={{ rotate: 15 }}
+                >
+                  <LucideTv className="h-5 w-5" />
+                </motion.div>
+                <div className="flex flex-col">
+                  <span className="font-bebas text-xl tracking-tight uppercase leading-none">
+                    ANIMADOM
+                  </span>
+                  <span className="text-[9px] font-bold tracking-[0.3em] text-primary uppercase">
+                    アニメ
+                  </span>
+                </div>
+              </div>
+
+              {/* Search */}
+              <div className="mb-8">
+                <div className="relative">
+                  <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter" && search.trim()) {
+                        navigate(
+                          `/search/${encodeURIComponent(search.trim())}`
+                        );
+                        setIsSidebarOpen(false);
+                        setSearch("");
+                      }
+                    }}
+                    placeholder="Search anime..."
+                    className="w-full bg-secondary/30 border border-border rounded-full py-3 pl-12 pr-6 text-sm focus:outline-none focus:border-primary transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Navigation Links */}
+              <nav className="mb-8 flex-1">
+                <ul className="flex gap-4 flex-col">
+                  {[
+                    { name: "Home", href: "/" },
+                    { name: "Trending", href: "/trending" },
+                    { name: "Top Rated", href: "/top-rated" },
+                    { name: "Upcoming", href: "/upcoming" },
+                    { name: "Characters", href: "/top_characters" },
+                    { name: "Collections", href: "/collections" },
+                    { name: "About", href: "/about" },
+                  ].map((item, i) => (
+                    <motion.li
+                      key={item.name}
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 + i * 0.08 }}
+                    >
+                      <Link
+                        to={item.href}
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="text-3xl sm:text-4xl font-bebas hover:text-primary transition-all duration-500 uppercase flex items-center gap-3 group"
+                      >
+                        {item.name}{" "}
+                        <ArrowUpRight className="opacity-0 group-hover:opacity-100 w-6 h-6 transition-opacity" />
+                      </Link>
+                    </motion.li>
+                  ))}
+                </ul>
+              </nav>
+
+              {/* Random Button */}
+              <div className="mb-6">
+                <RandomButton />
+              </div>
+
+              {/* Footer */}
+              <div className="pt-6 border-t border-border flex flex-col gap-4">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <motion.button
+                    onClick={toggleTheme}
+                    className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors"
+                    whileTap={{ scale: 0.9 }}
+                  >
                     {isDarkTheme ? (
                       <>
-                        <Moon className="h-4 w-4" /> Dark Mode
+                        <Moon className="h-4 w-4" /> DARK
                       </>
                     ) : (
                       <>
-                        <Sun className="h-4 w-4" /> Light Mode
+                        <Sun className="h-4 w-4" /> LIGHT
                       </>
                     )}
-                  </span>
-                </div>
+                  </motion.button>
 
-                <div className="mt-auto">
                   {!isAuthenticated ? (
                     <Link
                       to="/getstarted"
-                      className="block w-full"
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                      <Button className="w-full group">
-                        <span className="relative z-10">Get Started</span>
-                        <motion.span
-                          className="absolute inset-0 bg-primary/20 z-0"
-                          initial={{ width: 0 }}
-                          whileHover={{ width: "100%" }}
-                          transition={{ duration: 0.3 }}
-                        />
+                      <Button className="bg-primary text-primary-foreground font-bebas text-xs tracking-widest px-5 py-2 rounded-full hover:scale-105 transition-transform">
+                        GET STARTED
                       </Button>
                     </Link>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="flex gap-3 text-xs">
                       <Link
                         to={`/user/${user?.name}`}
-                        className="block py-2 hover:text-primary transition-colors flex items-center gap-3"
                         onClick={() => setIsSidebarOpen(false)}
+                        className="font-bold uppercase tracking-widest hover:text-primary transition-colors"
                       >
-                        <User className="h-4 w-4" /> Profile
-                      </Link>
-                      <Link
-                        to="/settings"
-                        className="block py-2 hover:text-primary transition-colors flex items-center gap-3"
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        Settings
+                        PROFILE
                       </Link>
                       <button
-                        className="w-full text-left py-2 hover:text-destructive transition-colors flex items-center gap-3"
                         onClick={handleLogout}
+                        className="font-bold uppercase tracking-widest hover:text-destructive transition-colors"
                       >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                          />
-                        </svg>
-                        Logout
+                        LOGOUT
                       </button>
                     </div>
                   )}
                 </div>
+                <div className="text-center">
+                  <p className="text-muted-foreground text-[9px] font-bold uppercase tracking-[0.3em]">
+                    &copy;{new Date().getFullYear()} ANIMADOM
+                  </p>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
